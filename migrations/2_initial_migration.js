@@ -43,13 +43,16 @@ BrightCoinRegulatedToken.deployed()
 instToken = instances[0];
 
  
+
  //Set the Address of contracts to the Regulated contracts.
 results = await Promise.all([
   BrightCoinRegulatedToken.address = instToken.address,
- instToken.setKYCAndAccridetionAddres(Instkyc.address,InstAccredition.address)
+ instToken.setKYCAndAccridetionAddres(Instkyc.address,InstAccredition.address) 
 ]);
 
 };
+
+
 
 
 

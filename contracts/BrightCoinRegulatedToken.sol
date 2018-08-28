@@ -172,7 +172,7 @@ function transfer(address newInvestor, uint256 tokens) public returns (bool)
   }
   
 
-function setKYCAndAccridetionAddres(address _kyc, address _InvestorAcrridetion ) public {
+function setKYCAndAccridetionAddres(address _kyc, address _InvestorAcrridetion ) onlyTokenOwner(owner) public {
 
 	
 	BrightCoinInvestorKYCAddress = _kyc;

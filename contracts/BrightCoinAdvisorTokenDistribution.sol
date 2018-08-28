@@ -14,7 +14,8 @@ constructor(address _owner) public
   owner = _owner;
 }
   //There might be multiple entry to this
- uint256 public constant TotalAllocatedAdvisorToken = 100000;
+ uint256 public constant InitialAllocatedAdvisorToken = 100000;
+ uint256 public TotalAllocatedAdvisorToken;
  uint256 public currentAllocatedAdvisorToken = 0; //To be taken as it is 
  
  struct AdvisorDistribution {

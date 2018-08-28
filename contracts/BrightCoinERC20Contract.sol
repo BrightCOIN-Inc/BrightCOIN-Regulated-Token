@@ -128,11 +128,11 @@ function UpdateTokenMintingOption(bool mintingOption) onlyTokenOwner(owner) publ
 
    totalSupply = initialSupply*(10**uint256(decimals));
 
-   TotalAllocatedTeamToken = TotalAllocatedTeamToken*(10**uint256(decimals));
-   FounderToken = FounderToken*(10**uint256(decimals));
-   RewardsBountyToken = RewardsBountyToken*(10**uint256(decimals));
-   CompanyHoldingValue = CompanyHoldingValue*(10**uint256(decimals));
-   TotalAllocatedAdvisorToken = TotalAllocatedAdvisorToken*(10**uint256(decimals));
+   TotalAllocatedTeamToken = InitialAllocatedTeamToken*(10**uint256(decimals));
+   FounderToken = InitialFounderToken*(10**uint256(decimals));
+   RewardsBountyToken = InitialRewardsBountyToken*(10**uint256(decimals));
+   CompanyHoldingValue = InitialCompanyHoldingValue*(10**uint256(decimals));
+   TotalAllocatedAdvisorToken = InitialAllocatedAdvisorToken*(10**uint256(decimals));
    
     balances[msg.sender] = totalSupply;
     BountyDistriuted = 0;

@@ -22,18 +22,21 @@ constructor(address _owner) public
  //The distribution amount, Timelock  is fixed 
  //mapping(address => uint256) FounderDistribution;
  address public constant FounderAddress = 0xcf530e5b154EB28A379cF5774d5d15B04cF10422;//To be updated via Script
- uint256 public constant FounderToken = 1000; //To be updated via Script
+ uint256 public constant InitialFounderToken = 1000; //To be updated via Script
+ uint256 public FounderToken;
  uint256 public constant FounderlockinPeriod  = 123456; //Token LockTIme
  
   
  //Rewards Token : The Amount of token to be used for Bounty and Rewards
-  uint256 public constant RewardsBountyToken = 1000; //To be updated via Script
+  uint256 public constant InitialRewardsBountyToken = 1000; //To be updated via Script
   uint256 public constant RewardBountylockinPeriod  = 234567;  
+  uint256 public RewardsBountyToken;
 
 
  //Company Holdings
  address public constant CompanyHoldingAddress = 0xcf530e5b154EB28A379cF5774d5d15B04cF10422;//To be updated via Script
- uint256 public constant CompanyHoldingValue = 1000;// Value to be updated via Script
+ uint256 public constant InitialCompanyHoldingValue = 1000;// Value to be updated via Script
+ uint256 public CompanyHoldingValue;
  uint256 public constant CompanyHoldinglockingPeriod = 123456; //Token LockTIme
  
 

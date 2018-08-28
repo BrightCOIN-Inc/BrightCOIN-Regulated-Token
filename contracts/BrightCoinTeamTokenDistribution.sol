@@ -14,7 +14,8 @@ constructor(address _owner) public
 }
 //Team Distribution  
  //There might be multiple entry to this
- uint256 public constant TotalAllocatedTeamToken = 100000;  // Token token allocated for Team distribution
+ uint256 public constant InitialAllocatedTeamToken = 100000;  // Token token allocated for Team distribution
+ uint256 public TotalAllocatedTeamToken;
  uint256 internal currentAllocatedTeamToken = 0;  //To be added as it is 
  
  struct TeamDistribution {
