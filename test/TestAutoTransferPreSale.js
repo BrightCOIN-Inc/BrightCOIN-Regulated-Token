@@ -20,7 +20,7 @@ contract('Testing AutoTransfer & Token  Distribution', (accounts) => {
     
   })
 
-  let OwnerBal1,OwnerBal2,AccountBal1,AccountBal2,NewAccountBal1,AccountBal3,currenttime
+  let OwnerBal1,OwnerBal2,AccountBal1,AccountBal2,NewAccountBal1,AccountBal3,currenttime,KYCCount,AccountBal4,AfterMintBal
   
   /*START...............................................................................................*/
 //ADD Token for 2 Advisors and then Remove him for further Getting token then trying to give him Token
@@ -32,13 +32,16 @@ contract('Testing AutoTransfer & Token  Distribution', (accounts) => {
     	//Start
        var KYCExpiryDateTime = 1566102022;
        var ipfsHashKYC = "QmWDhue9iG8YJPh65TdD6zEYHZeeJKyVJC1e2uARwHGPC7";
-     // var InvestordAddress = 0x9750aa30a3281dF657d8B08499e1b5Dbc90e0b5f;
-    instancekyc.SetKYCDetailsofInvestor(account,true,KYCExpiryDateTime,ipfsHashKYC,{from: accounts[0]});
+     
+   instancekyc.SetKYCDetailsofInvestor(account,true,KYCExpiryDateTime,ipfsHashKYC,{from: accounts[0]});
    instancekyc.SetKYCDetailsofInvestor(NewOwner,true,KYCExpiryDateTime,ipfsHashKYC,{from: accounts[0]});
+
+   KYCCount = await instancekyc.GetKYCCount();
 
     	//End
 
-
+        //Stop ICO Abruptly
+       StopICO =  await instance.StopICO(true,{from: accounts[0]});
     	//Set RegD Accredition
     	//Start
     	/* Set Accridition Details*/
@@ -53,21 +56,31 @@ contract('Testing AutoTransfer & Token  Distribution', (accounts) => {
     currenttime  = await instance.GetCurrentTime();
     OwnerBal1 = await instance.balanceOf(owner);
     AccountBal1  = await instance.balanceOf(account); 
-   Transaction1  = await instance.sendTransaction({from:account,value:(0.6)*10**18});
+   Transaction1  = await instance.sendTransaction({from:account,value:(0.5)*10**18});
     
-   DistributeToken = await instance.DistributeToken(account,1534567000,1566102023,0,{from: accounts[0]});
+    DistributeToken = await instance.DistributeToken(account,1536205322,1566102023,0,{from: accounts[0]});
 
-    AccountBal2  = await instance.balanceOf(account);
+  AccountBal2  = await instance.balanceOf(account);
    OwnerBal2  = await instance.balanceOf(owner);
     
-
 
     //Now Transfer this token to New Investor	
 
  NewTransfer   = instance.transfer(NewOwner,50*(10**18) ,{from: accounts[1]});
-  NewAccountBal1  = await instance.balanceOf(NewOwner);
-    AccountBal3  = await instance.balanceOf(account);
+ NewAccountBal1  = await instance.balanceOf(NewOwner);
+   AccountBal3  = await instance.balanceOf(account);
   
+
+
+  //Now Mint the token
+
+      mint = await instance.mint(owner,2000*(10**18),{from: accounts[0]});
+      AfterMintBal = await instance.balanceOf(owner);
+
+
+   //Now Test Burn Token
+     burn = await instance.burn(1000000*(10**18),{from: accounts[0]});
+      AccountBal4  = await instance.balanceOf(owner);
 
 
     } 
@@ -81,6 +94,10 @@ contract('Testing AutoTransfer & Token  Distribution', (accounts) => {
   console.log(OwnerBal2, "OwnerBal2");
     console.log(NewAccountBal1,"NewAccountBal1");
   console.log(AccountBal3,"AccountBal3");
+  console.log(KYCCount,"KYC Count");
+   console.log(AfterMintBal,"Post Mint Balance");
+ console.log(AccountBal4,"Post Burn Balance");
+
 
    
    

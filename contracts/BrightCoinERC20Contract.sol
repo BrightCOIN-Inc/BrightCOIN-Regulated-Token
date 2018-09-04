@@ -20,6 +20,7 @@ contract BrightCoinERC20 is BrightCoinTokenOwner,TokenPreSaleDetails(msg.sender)
   event ICOSoftCapReached(string softcap);
   event ICOSoftUnsuccessFull(uint256 TokenSold,string str);
   event Burn(address addr, uint256 tokens);
+  event Mint(address target, uint256 mintedAmount);
   
  //Token Details  
   string public constant Tokensymbol = "ABC"; // This is token symbol
@@ -27,6 +28,7 @@ contract BrightCoinERC20 is BrightCoinTokenOwner,TokenPreSaleDetails(msg.sender)
   uint256 public constant decimals = 18; // decimal digit for token price calculation
   string public constant version = "1.0";
   uint8 public constant ICOType = 0;   //0 for RegD , 1 for RegS and 2 for RedD & RegS and 3x means utility ICO
+  bool  internal isICOActive = true; 
   
   enum BrightCoinICOType { RegD, RegS, RegDRegS, Utility }
 
@@ -50,7 +52,7 @@ contract BrightCoinERC20 is BrightCoinTokenOwner,TokenPreSaleDetails(msg.sender)
     Soft cap is the minimal amount required by your project, to make it viable, in order to continue. If you do not reach that amount during your ICO then you should allow your investors to refund their money using a push/ pull mechanism.
  */
   uint internal ICOSoftCap = 1000000; //Minimum Eather to Reach
-  uint internal ICOHardCap = 7*(10**6)*(10**uint256(decimals));  //Maximum Eather to Reach
+  uint internal ICOHardCap = 7*(10**6)*(10**uint256(decimals));  //Maximum Ether to Reach
 
   function ChangeSoftCap(uint newSoftCap) public onlyTokenOwner(owner) {
         require(ICOSoftCap != newSoftCap);
@@ -65,7 +67,7 @@ contract BrightCoinERC20 is BrightCoinTokenOwner,TokenPreSaleDetails(msg.sender)
       
     }
 
-    function GetSoftCap()   onlyTokenOwner(owner) view public  returns(uint256) {
+    function GetSoftCap() onlyTokenOwner(owner) view public  returns(uint256) {
 
       return ICOSoftCap;
     }
@@ -167,7 +169,10 @@ function totalSupply() public constant returns (uint256) {
         return 1;
       }
     
-    //Function for transfer the token from the contract to another address
+   
+    /// @notice Will Transfer tokens from current address to receipient address.
+    /// @param to  addresses to send token.
+    /// @param tokens amount of token to be transferred.
     function internaltransfer(address to, uint256 tokens) internal returns (bool) {
   
      // Prevent transfer to 0x0 address. 
@@ -208,13 +213,12 @@ function totalSupply() public constant returns (uint256) {
     /// Internal method shared by `mint()` and `airdropMinting()`.
     function mintToken(address _to, uint256 _value) internal {
 
-        require(BountyDistriuted.add(_value) <= RewardsBountyToken);
-        BountyDistriuted = BountyDistriuted.add(_value); //Add the token into current count;
+   
         balances[_to]  = balances[_to].add(_value);
-        //initialSupply =  initialSupply.add(_value); //it can not be changed
-        require(balances[_to] >= _value && initialSupply >= _value); // overflow checks
-        emit Transfer(msg.sender, _to, _value);
-    }
+        totalSupply =  totalSupply.add(_value); 
+        require(balances[_to] >= _value && totalSupply >= _value); // overflow checks
+        emit  Mint(_to, _value);
+    } 
 
     /// @notice it will burn all the token passed as parameter.
     /// @param _value Value of token to be burnt
@@ -228,7 +232,14 @@ function totalSupply() public constant returns (uint256) {
     balances[burner] = balances[burner].sub(_value);
     totalSupply = totalSupply.sub(_value);
     emit Burn(burner, _value);
-}
+   }
+
+
+   //Owner of ICO can anytime Stop the ICO post that no any transaction will happen
+   function StopICO(bool _status) onlyTokenOwner(owner) public {
+
+    isICOActive = _status;
+   }
   
 
 }

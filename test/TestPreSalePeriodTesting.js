@@ -26,14 +26,15 @@ let  ChangePreSaleEdDate,ChangePreSaleStartDate,InPreSalePeriod
     try {
 
 
+//1536545897
       //Check if Current time is inPreSale
-    InPreSalePeriod = await instance.inPreSalePeriod(1534950356);
+    InPreSalePeriod = await instance.inPreSalePeriod(1536545900);
 
      //Now Change Current PreSale Start Date & End Time.
-   ChangePreSaleStartDate = await instance.changeStartDate(1534940300,{from: accounts[0]});
+   ChangePreSaleStartDate = await instance.changeStartDate(1536545500,{from: accounts[0]});
 
     //Now Change Current PreSale Start Date & End Time.
-   ChangePreSaleEdDate = await instance.changeEndDate(1545482000,{from: accounts[0]});
+ //  ChangePreSaleEdDate = await instance.changeEndDate(1545482000,{from: accounts[0]});
 
  
     

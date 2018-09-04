@@ -2,7 +2,7 @@ pragma solidity ^0.4.24;
 
 import "./BrightCoinTokenOwner.sol";
 
-contract BrightCoinInvestorKYC
+contract BrightCoinInvestorKYC is BrightCoinTokenOwner
 {
 
 uint256 public constant Maximumcontributors = 100000; //Maximum no of Contributors
@@ -25,7 +25,7 @@ mapping(address => BrightCoinInvestorKYCstruct) BrightCoinInvestorKYCDetails;
 address[] public BrightCoinInvestorKYCAddr;
 
 function SetKYCDetailsofInvestor(address InvestordAddress,bool KYCStatus,
-                                uint256 KYCExpiryDateTime, string ipfsHashKYC) public 
+                                uint256 KYCExpiryDateTime, string ipfsHashKYC) onlyTokenOwner(owner) public 
  {
          
       require( BrightCoinInvestorKYCAddr.length <= Maximumcontributors);
@@ -56,7 +56,7 @@ function GetKYCDetails(address InvestordAddress)  public view returns(string)
     return InvestorKYC.ipfsHashKYC;
 }
 
-function GetKYCExpityDate(address InvestordAddress)  public view returns(uint256)
+function GetKYCExpiryDate(address InvestordAddress)  public view returns(uint256)
 {
     
     BrightCoinInvestorKYCstruct storage InvestorKYC = BrightCoinInvestorKYCDetails[InvestordAddress];

@@ -69,6 +69,7 @@ function calculateTokenmount()  private {
 
           InvestorBalances[msg.sender] = tokens;   
           CalculatetokenWithMailSalePeriod[msg.sender] = false;
+
     }
     else  //MainSale
     {
@@ -92,7 +93,8 @@ function GetTokenAmount(address addr) onlyTokenOwner(owner) view public returns(
 function () external payable  
 {
   
-   
+     require(isICOActive == true);
+
     calculateTokenmount();
    //Do not calculte anything here simply tranfer the money to the ower.
 
@@ -109,7 +111,7 @@ function () external payable
       require(expiryDateTime > 0);
 
        
-        if(MainSalePeriodIndex == 0)  //PreSale
+        if((MainSalePeriodIndex == 0) && (PreSaleOn == true))  //PreSale
         {
           
         require(AccreditationInfo.checkInvestorValidity(AddrOfInvestor,currenttime,ICOType) == true);
@@ -128,9 +130,14 @@ function () external payable
             //Calculate token amount
             if(CheckIfMainSaleOn(MainSalePeriodIndex) == true)
             {
+
+              require(CheckTokenPeriodSale(currenttime,MainSalePeriodIndex) == true);
+
                 uint256 bonusamount = GetBonusDetails(MainSalePeriodIndex);
                 uint256 FinalToken = InvestorBalances[AddrOfInvestor].add(bonusamount); 
-                require(CheckIfHardcapAchived(FinalToken) == true);
+                //Need to check whether Token amount is in the range of current Main sale Period 
+                require(CheckMainSaleLimit(MainSalePeriodIndex,FinalToken) == true);
+               // require(CheckIfHardcapAchived(FinalToken) == true);
                 require(AccreditationInfo.checkInvestorValidity(AddrOfInvestor,currenttime,ICOType) == true);
                 AccreditationInfo.SetLockingPeriodAndToken(AddrOfInvestor,expiryDateTime,FinalToken,ICOType);
 
@@ -166,7 +173,7 @@ function transfer(address newInvestor, uint256 tokens) public returns (bool)
       }
     
         internaltransfer(newInvestor,tokens);
-       // emit Transfer(msg.sender, newInvestor, tokens);
+       emit Transfer(msg.sender, newInvestor, tokens);
 
         
   }
@@ -191,11 +198,4 @@ function setKYCAndAccridetionAddres(address _kyc, address _InvestorAcrridetion )
     }
 
 
-
-
-
-
-
-
-	
 }

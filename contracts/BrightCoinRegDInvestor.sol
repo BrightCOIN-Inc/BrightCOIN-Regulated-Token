@@ -30,7 +30,7 @@ struct RegDInvestor
     uint256 AccreditionExpiryDateTime;
     uint256 lockInEndDate;
     uint256 TokenPurchased;
-    uint256 InvestorGeoLocation;  //Must be USA Citizen Only
+    uint256 InvestorGeoLocation;  //Must be USA Citizen Only in Case of RegDRegS Investment
     string ipfsHashRegDInvestor; //It must contains the details of Investor
        
 }
