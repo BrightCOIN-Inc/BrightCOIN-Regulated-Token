@@ -60,23 +60,23 @@ function calculateTokenmount()  private {
    if(PreSaleOn)
     {
 
-         require(inPreSalePeriod(now) == true); 
+        require(inPreSalePeriod(now) == true); 
          uint256 newPurchaseRate  = purchaseRate.add((purchaseRate.mul(Discount)).div(100));
          uint256 tokens = newPurchaseRate.mul(msg.value); 
          tokens.add(BonusAmountPreSale); 
 
-          require(CheckIfHardcapAchived(tokens) == true);
+         require(CheckIfHardcapAchived(tokens) == true);
 
-          InvestorBalances[msg.sender] = tokens;   
+         InvestorBalances[msg.sender] = tokens;   
           CalculatetokenWithMailSalePeriod[msg.sender] = false;
 
     }
     else  //MainSale
     {
       
-        uint256 mainSaleToken = purchaseRate.mul(msg.value);
-        require(CheckIfHardcapAchived(mainSaleToken) == true);
-        InvestorBalances[msg.sender] = mainSaleToken;  
+       uint256 mainSaleToken = purchaseRate.mul(msg.value);
+       require(CheckIfHardcapAchived(mainSaleToken) == true);
+       InvestorBalances[msg.sender] = mainSaleToken;  
         CalculatetokenWithMailSalePeriod[msg.sender] = true;
 
     }
@@ -92,8 +92,8 @@ function GetTokenAmount(address addr) onlyTokenOwner(owner) view public returns(
 
 function () external payable  
 {
-  
-     require(isICOActive == true);
+
+   require(isICOActive == true);
 
     calculateTokenmount();
    //Do not calculte anything here simply tranfer the money to the ower.
@@ -155,27 +155,28 @@ function () external payable
 function transfer(address newInvestor, uint256 tokens) public returns (bool) 
   {     
 
-     require(CheckIfHardcapAchived(tokens) == true);
         
      //check KYC info of both Investor and Token Provider
      require(InvestorKYCInfo.CheckKYCStatus(msg.sender,now) == true); 
       require(InvestorKYCInfo.CheckKYCStatus(newInvestor,now) == true); 
 
 
-     //Now If ICO Type is RegSRegD  then also we have to make sure that RegD is only Tranferring to RegD
-     //check whether new investor is Accredated 
-      require(AccreditationInfo.checkBothInvestorValidity(msg.sender,newInvestor,now, ICOType) == true); 
-          
-      uint256 TokenLockExpiryRegS =  AccreditationInfo.GetTokenLockExpiryDateTimeRegS(msg.sender,ICOType);
-      if(TokenLockExpiryRegS > 0)
-      {
-         AccreditationInfo.SetLockingPeriodAndToken(newInvestor,TokenLockExpiryRegS,tokens,ICOType); 
-      }
-    
-        internaltransfer(newInvestor,tokens);
-       emit Transfer(msg.sender, newInvestor, tokens);
+      //check if locking period is expired or not 
 
+     //uint256 currenttime = now + 1 years;
+    uint256 currenttime = now;
+
+    uint256 TokenLockExpiry =  AccreditationInfo.GetTokenLockExpiryDateTime(msg.sender,ICOType);
+    if(currenttime < TokenLockExpiry)  // then it can only transfer token to Accriteded Investor only
+    {
+      require(AccreditationInfo.checkBothInvestorValidity(msg.sender,newInvestor,currenttime, ICOType) == true); 
+      AccreditationInfo.SetLockingPeriodAndToken(newInvestor,TokenLockExpiry,tokens,ICOType);
         
+    }
+
+    internaltransfer(newInvestor,tokens);
+     emit Transfer(msg.sender, newInvestor, tokens);
+
   }
   
 

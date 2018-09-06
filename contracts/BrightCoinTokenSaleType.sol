@@ -18,15 +18,15 @@ contract TokenPreSaleDetails is BrightCoinTokenOwner
   
    //For Presales Only 
     uint256  public constant maxCoinSoldDuringPresale = 1000*100;
-    uint256  public constant BonusAmountPreSale = 1000;
-    uint8    public constant Discount = 10; 
+    uint256  public constant BonusAmountPreSale = 0;
+    uint8    public constant Discount = 0; 
 
     //Presale Maximum and Minmum Contributions
     uint256  internal MinimumContributionPreSale = 0.5 ether;
     uint256  internal MaximumContributionPreSale  = 30 ether;
 
     //PreSale Start & End Dates 
-    uint256 internal ICOstartDate = 1536061800;    //10/09/2018
+    uint256 internal ICOstartDate = 1536061800;    
     uint256 internal ICOendDate = 1566102022;     //22/12/2018
  
      //Function for changing the startDate of Presale
@@ -111,8 +111,8 @@ function AddMainSalePeriod(uint256 mainStartDate,uint256 mainSaleEndDate,uint256
  function CheckTokenPeriodSale(uint256 DateTimeStamp, uint8 PeriodIndex) onlyTokenOwner(owner) public view returns(bool) {
 
         MainSaleTokenDistrubution storage MainSaleTokenSale = MainSaleCountMapping[PeriodIndex];
-       // require(MainSaleTokenSale.mainStartDate !=0);
-        //require(MainSaleTokenSale.mainSaleEndDate !=0);
+       require(MainSaleTokenSale.mainStartDate !=0);
+        require(MainSaleTokenSale.mainSaleEndDate !=0);
 
         if( (MainSaleTokenSale.mainStartDate < DateTimeStamp) && (MainSaleTokenSale.mainSaleEndDate > DateTimeStamp) )
         return true;

@@ -41,11 +41,11 @@ pragma solidity ^0.4.24;
 
 import "./BrightCoinTokenOwner.sol";
 import "./BrightCoinRegSInvestor.sol";
-import "./BrightCoinRegDInvestor.sol";
+import "./BrightCoinAccreditionInvestor.sol";
 
 
 
-contract BrightCoinInvestorAccreditationCheck is BrightCoinRegDInvestor(msg.sender),BrightCoinRegSInvestor(msg.sender)
+contract BrightCoinInvestorAccreditationCheck is BrightCoinAccreditionInvestor(msg.sender),BrightCoinRegSInvestor(msg.sender)
 {
 
 enum BrightCoinInvestorType { RegD, RegS, RegDRegS, Utility }
@@ -60,44 +60,83 @@ constructor() public
  function checkBothInvestorValidity(address investor, address InvestorAddress, uint256 currentdatetime, uint8 ICOType)  public view returns(bool)
  {
 
-    bool validityStatus = false;
+   bool validityStatus = false;
     bool Investoevalidity = false;
     bool newInvestorvalidity = false;
  
     if(ICOType == uint8(BrightCoinInvestorType.RegD))
     {
-      Investoevalidity = CheckAccreditionStatusRegD(investor,currentdatetime);
-      newInvestorvalidity = CheckAccreditionStatusRegD(InvestorAddress,currentdatetime);
+      Investoevalidity = CheckAccreditionStatus(investor,currentdatetime);
+      newInvestorvalidity = CheckAccreditionStatus(InvestorAddress,currentdatetime);
        if( Investoevalidity == newInvestorvalidity)
             return true;
     }
     else if (ICOType == uint8(BrightCoinInvestorType.RegS))
     {
+
+        uint256 geoLocation1;
+        uint256 geoLocation2;
   
-      Investoevalidity = CheckAccreditionStatusRegS(investor,currentdatetime);
-      newInvestorvalidity = CheckAccreditionStatusRegS(InvestorAddress,currentdatetime);
-       if( Investoevalidity == newInvestorvalidity)
-            return true;
+        //check Accridition Status of Both the Investor as
+          Investoevalidity = CheckAccreditionStatus(investor,currentdatetime);
+          if(Investoevalidity == true) 
+               geoLocation1 = GetGeoLocationAccreditedInvestor(investor);
+           else
+           geoLocation1 = GetGeoLocationOfInvestor(investor);
+
+           //check of other Investor
+           Investoevalidity = CheckAccreditionStatus(InvestorAddress,currentdatetime);
+          if(Investoevalidity == true) 
+               geoLocation2 = GetGeoLocationAccreditedInvestor(InvestorAddress);
+           else
+           geoLocation2 = GetGeoLocationOfInvestor(InvestorAddress);
+
+           if( geoLocation1 !=1 && geoLocation2 != 1 )  //Make sure GeoLocation ius not USA
+              validityStatus =  true;   
+     
+      return validityStatus;
 
     }
-    else if(ICOType == uint8(BrightCoinInvestorType.RegDRegS))
+    else if (ICOType == uint8(BrightCoinInvestorType.RegDRegS))
     {
-        //Do check for RegD and RegS stuff
-        Investoevalidity = CheckAccreditionStatusRegD(investor,currentdatetime);
-        newInvestorvalidity = CheckAccreditionStatusRegD(InvestorAddress,currentdatetime);
 
-        if(Investoevalidity == newInvestorvalidity)
-            return true;
-        else
-        {            
-           Investoevalidity = CheckAccreditionStatusRegD(investor,currentdatetime);
-           newInvestorvalidity = CheckAccreditionStatusRegD(InvestorAddress,currentdatetime);
-           if(Investoevalidity == newInvestorvalidity)
-            return true;
-        }
+        bool validityStatus1 = false;
+        bool validityStatus2 = false;
+        uint256 geolocation;
+        
+        Investoevalidity = CheckAccreditionStatus(investor,currentdatetime);
+          if(Investoevalidity == false) 
+          {
+               geolocation = GetGeoLocationOfInvestor(investor);
+               if(geolocation != 1)
+                 validityStatus1 =  true; 
+          }
+          else
+          {
+             validityStatus1 =  true; 
+          }
 
-        return validityStatus;
+          bool Investorevalidity2 = CheckAccreditionStatus(InvestorAddress,currentdatetime);
+          if(Investorevalidity2 == false) 
+          {
+               geolocation = GetGeoLocationOfInvestor(InvestorAddress);
+               if( geolocation != 1)
+                 validityStatus2 =  true; 
+          }
+          else
+          {
+             validityStatus2 =  true; 
+          }
 
+          if( (validityStatus1 == true) && (validityStatus2 == true))
+          return true;
+          else
+          return false;
+          
+          
+
+      
+           
     }
     else  //Utility ICO 
     {
@@ -115,28 +154,45 @@ function checkInvestorValidity( address InvestorAddress, uint256 currentdatetime
  {
 
     bool validityStatus = false;
-  
+    uint256 GeoLocation;
  
     if(ICOType == uint8(BrightCoinInvestorType.RegD))
     {
-      validityStatus = CheckAccreditionStatusRegD(InvestorAddress,currentdatetime);
+      validityStatus = CheckAccreditionStatus(InvestorAddress,currentdatetime);
        return validityStatus;
     }
     else if (ICOType == uint8(BrightCoinInvestorType.RegS))
     {
    
-      validityStatus = CheckAccreditionStatusRegS(InvestorAddress,currentdatetime);
+      //check if Investor is Accrideted One
+      bool AccreditionStatus  = CheckAccreditionStatus(InvestorAddress,currentdatetime);
+      if(AccreditionStatus == true)
+      {
+          // now check GeoLocatiom
+          uint256 geoLocation = GetGeoLocationAccreditedInvestor(InvestorAddress);
+          if(geoLocation != 1) // If Not USA then return true;
+            validityStatus = true;
+
+          return validityStatus;
+      }    
+
+      GeoLocation = GetGeoLocationOfInvestor(InvestorAddress);
+      if(GeoLocation != 1) //Should not be USA
+      validityStatus = true;
       return validityStatus;
 
     }
     else if(ICOType == uint8(BrightCoinInvestorType.RegDRegS))
     {
         //Do check for RegD and RegS stuff
-        validityStatus = CheckAccreditionStatusRegD(InvestorAddress,currentdatetime);
+        validityStatus = CheckAccreditionStatus(InvestorAddress,currentdatetime);
         if(validityStatus == false)
         {            
            
-           validityStatus = CheckAccreditionStatusRegS(InvestorAddress,currentdatetime);
+           GeoLocation = GetGeoLocationOfInvestor(InvestorAddress);
+           if(GeoLocation != 1) //Should not be USA  
+            validityStatus = true;
+         
            return validityStatus;
         }
         return validityStatus;
@@ -157,26 +213,32 @@ function checkInvestorValidity( address InvestorAddress, uint256 currentdatetime
                                       uint256 tokenamount, uint8 ICOType) public
  {
 
+ bool validityStatus = false;
   if(ICOType == uint8(BrightCoinInvestorType.RegD))
     {
-      SetLockingPeriodRegD(InvestorAddress,expiryDateTime,tokenamount);
+      SetLockingPeriodAccreditedInvestor(InvestorAddress,expiryDateTime,tokenamount);
     }
     else if (ICOType == uint8(BrightCoinInvestorType.RegS))
     {
-
-           SetLockingPeriodRegS(InvestorAddress,expiryDateTime,tokenamount);
+        //Check Accridition Status
+         validityStatus = CheckAccreditionStatus(InvestorAddress,now);
+        if(validityStatus == true)
+          SetLockingPeriodAccreditedInvestor(InvestorAddress,expiryDateTime,tokenamount);
+        else
+        SetLockingPeriodRegS(InvestorAddress,expiryDateTime,tokenamount);
+        
     }
     else if(ICOType == uint8(BrightCoinInvestorType.RegDRegS))
     {
         //Do check for RegDand RegS stuff
-        bool validityStatus = CheckAccreditionStatusRegD(InvestorAddress,now);
+         validityStatus = CheckAccreditionStatus(InvestorAddress,now);
         if(validityStatus == false)
         {
             //It must be RegS Investor
          SetLockingPeriodRegS(InvestorAddress,expiryDateTime,tokenamount);
         }
         else
-        SetLockingPeriodRegD(InvestorAddress,expiryDateTime,tokenamount);
+        SetLockingPeriodAccreditedInvestor(InvestorAddress,expiryDateTime,tokenamount);
 
     }
     else  //Utility ICO 
@@ -186,20 +248,21 @@ function checkInvestorValidity( address InvestorAddress, uint256 currentdatetime
 
  }
 
-  function GetTokenLockExpiryDateTimeRegS(address senderAddr,uint8 ICOType ) public view returns(uint256)
+  function GetTokenLockExpiryDateTime(address senderAddr,uint8 ICOType ) public view returns(uint256)
   {
       uint256 lockingexpiryDate;
+      bool validityStatus = false;
 
      if(ICOType == uint8(BrightCoinInvestorType.RegD))
     {
-      lockingexpiryDate = GetTokenLockExpiryDateTimeRegD(senderAddr);
+      lockingexpiryDate = GetTokenLockExpiryDateTimeAccreditedInvestor(senderAddr);
       return lockingexpiryDate;
     }
     else if(ICOType == uint8(BrightCoinInvestorType.RegDRegS))
     {
 
         //Do check for RegDand RegS stuff
-        bool validityStatus = CheckAccreditionStatusRegD(senderAddr,now);
+        validityStatus = CheckAccreditionStatus(senderAddr,now);
         if(validityStatus == false)
         {
             lockingexpiryDate = GetTokenLockExpiryDateTimeRegS(senderAddr);  //RegS Investor
@@ -207,7 +270,7 @@ function checkInvestorValidity( address InvestorAddress, uint256 currentdatetime
         }
         else
         {
-            lockingexpiryDate = GetTokenLockExpiryDateTimeRegD(senderAddr);  //RegD Investor
+            lockingexpiryDate = GetTokenLockExpiryDateTimeAccreditedInvestor(senderAddr);  //Accriderted Investor
              return lockingexpiryDate;
         }
 
@@ -215,7 +278,12 @@ function checkInvestorValidity( address InvestorAddress, uint256 currentdatetime
    else if(ICOType == uint8(BrightCoinInvestorType.RegS))
     {
 
+         validityStatus = CheckAccreditionStatus(senderAddr,now);
+        if(validityStatus == true)
+          lockingexpiryDate = GetTokenLockExpiryDateTimeAccreditedInvestor(senderAddr);
+        else
         lockingexpiryDate = GetTokenLockExpiryDateTimeRegS(senderAddr);  //RegS Investor
+
         return lockingexpiryDate;
 
     }

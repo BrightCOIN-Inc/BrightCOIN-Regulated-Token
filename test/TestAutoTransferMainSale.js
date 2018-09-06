@@ -87,8 +87,8 @@ contract('Testing AutoTransfer & Token  Distribution', (accounts) => {
       var expiryDateRegD = 1566102022;
      var InvestorGeolocation = 1;
       var ipfsHash = "QmWDhue9iG8YJPh65TdD6zEYHZeeJKyVJC1e2uARwHGPC7";
-     instanceAcridetion.AddRegDInvestorDetails(account,true,expiryDateRegD,InvestorGeolocation,ipfsHash,{from: accounts[0]});
-     instanceAcridetion.AddRegDInvestorDetails(NewOwner,true,expiryDateRegD,InvestorGeolocation,ipfsHash,{from: accounts[0]});
+     instanceAcridetion.AddInvestorAccreditionDetails(account,true,expiryDateRegD,InvestorGeolocation,ipfsHash,{from: accounts[0]});
+     instanceAcridetion.AddInvestorAccreditionDetails(NewOwner,true,expiryDateRegD,InvestorGeolocation,ipfsHash,{from: accounts[0]});
       //End
     	//End  //1534567000
     currenttime  = await instance.GetCurrentTime();

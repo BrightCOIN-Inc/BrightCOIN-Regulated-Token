@@ -23,7 +23,6 @@ constructor(address _owner) public
 
     struct RegSInvestor {
         address Investor;
-        uint256 AccreditionExpiryDateTime;
         uint256 lockInEndDate;
         uint256 InvestedAmount;
         uint256 InvestorGeoLocation;
@@ -35,46 +34,29 @@ constructor(address _owner) public
     address[] public regSInvestors;
 
     /*Function to Add Investor details*/
-     function  AddRegSInvestorDetails(address Investoraddr,uint256 AccreditionExpiryDateTime,
-                                        uint256 InvestorGeoLocation, string ipfsHashRegSInvestor )
+     function  AddRegSInvestorDetails(address Investoraddr,uint256 InvestorGeoLocation, string ipfsHashRegSInvestor )
                                           onlyTokenOwner(owner) public {
       
-      require(AccreditionExpiryDateTime > 0);
       require(Investoraddr != 0x0);
 
        RegSInvestor storage Investment = RegSInvestorsDetails[Investoraddr];
 
        Investment.Investor = Investoraddr;
-       Investment.AccreditionExpiryDateTime = AccreditionExpiryDateTime;
        Investment.InvestorGeoLocation = InvestorGeoLocation;
        Investment.ipfsHashRegSInvestor = ipfsHashRegSInvestor;
        Investment.lockInEndDate = 0;
        Investment.InvestedAmount = 0;
-
        regSInvestors.push(Investoraddr);
 }
 
     
-
-
-//Function to check if Accridition is ok
-function CheckAccreditionStatusRegS( address RegSInvestoraddr, uint256 currentdatetime)  view internal returns(bool)
+ function GetGeoLocationOfInvestor(address Investoraddr) view public returns(uint256)
  {
-  
-   RegSInvestor storage structRegs =  RegSInvestorsDetails[RegSInvestoraddr];
+    RegSInvestor storage structRegS =  RegSInvestorsDetails[Investoraddr];
+    return structRegS.InvestorGeoLocation;
+ }
 
-    if((currentdatetime > 0) && (RegSInvestoraddr != 0x0))
-      {
-
-          if(structRegs.AccreditionExpiryDateTime > currentdatetime)
-             return true;
-      }
-
-      return false;
-   }
- 
-
-function SetLockingPeriodRegS(address RegSInvestoraddr, uint256 lockExpiryDateTime, uint256 tokenamount) onlyTokenOwner(owner) internal {
+function SetLockingPeriodRegS(address RegSInvestoraddr, uint256 lockExpiryDateTime, uint256 tokenamount) internal {
 
   require(lockExpiryDateTime > 0);
   require(RegSInvestoraddr != 0x0);

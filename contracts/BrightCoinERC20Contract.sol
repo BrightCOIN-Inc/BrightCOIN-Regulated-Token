@@ -27,14 +27,13 @@ contract BrightCoinERC20 is BrightCoinTokenOwner,TokenPreSaleDetails(msg.sender)
   string public constant TokenName = "TokenName"; // this is token name
   uint256 public constant decimals = 18; // decimal digit for token price calculation
   string public constant version = "1.0";
-  uint8 public constant ICOType = 0;   //0 for RegD , 1 for RegS and 2 for RedD & RegS and 3x means utility ICO
+  uint8 public constant ICOType = 1;   //0 for RegD , 1 for RegS and 2 for RedD & RegS and 3x means utility ICO
   bool  internal isICOActive = true; 
   
   enum BrightCoinICOType { RegD, RegS, RegDRegS, Utility }
 
 //Token Supply Details
-  //uint256 public constant initialSupply = 100*(10**6);
-  uint256 public constant initialSupply = 10**6;
+  uint256 public constant initialSupply = 100000;
   uint256 public totalSupply; //Need to set at constructor level
   uint256 private  BountyDistriuted = 0;
   
@@ -52,7 +51,9 @@ contract BrightCoinERC20 is BrightCoinTokenOwner,TokenPreSaleDetails(msg.sender)
     Soft cap is the minimal amount required by your project, to make it viable, in order to continue. If you do not reach that amount during your ICO then you should allow your investors to refund their money using a push/ pull mechanism.
  */
   uint internal ICOSoftCap = 1000000; //Minimum Eather to Reach
-  uint internal ICOHardCap = 7*(10**6)*(10**uint256(decimals));  //Maximum Ether to Reach
+  //uint internal ICOHardCap = 7*(10**6)*(10**uint256(decimals));  //Maximum Ether to Reach
+  uint internal ICOHardCap = 20000;
+
 
   function ChangeSoftCap(uint newSoftCap) public onlyTokenOwner(owner) {
         require(ICOSoftCap != newSoftCap);
@@ -135,7 +136,8 @@ function UpdateTokenMintingOption(bool mintingOption) onlyTokenOwner(owner) publ
    RewardsBountyToken = InitialRewardsBountyToken*(10**uint256(decimals));
    CompanyHoldingValue = InitialCompanyHoldingValue*(10**uint256(decimals));
    TotalAllocatedAdvisorToken = InitialAllocatedAdvisorToken*(10**uint256(decimals));
-   
+   ICOHardCap = ICOHardCap*(10**uint256(decimals));
+
     balances[msg.sender] = totalSupply;
     BountyDistriuted = 0;
  
