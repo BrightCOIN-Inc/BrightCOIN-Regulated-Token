@@ -95,14 +95,25 @@ constructor(address _owner) public
  }
 
  //check Amount with Advisor
- function CheckTeamTokenAmount(address NewAdvisorAddr) view public returns(uint256)
+ function CheckTeamTokenAmount(address NewTeamAddr) view public returns(uint256)
  {
 
-  TeamDistribution storage TeamDetails = TeamDistributionDetails[NewAdvisorAddr];
+  TeamDistribution storage TeamDetails = TeamDistributionDetails[NewTeamAddr];
   //require(TeamDetails.TeamDistributionIndex == true);
         return TeamDetails.TeamDistributionAmount;
 
  }
+
+function GetTeamToken(address NewTeamAddr, uint256 currentdatetime)  view internal  returns(uint256)
+{
+
+TeamDistribution storage TeamDetails = TeamDistributionDetails[NewTeamAddr];
+
+  //check if eligible for token
+  require(currentdatetime > TeamDetails.TeamDistributionAmountLockExpiryDateTime);
+
+   return TeamDetails.TeamDistributionAmount;
+}
 
 
 

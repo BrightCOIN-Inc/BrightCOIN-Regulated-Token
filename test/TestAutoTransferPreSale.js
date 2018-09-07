@@ -49,15 +49,17 @@ contract('Testing AutoTransfer & Token  Distribution', (accounts) => {
     	/* Set Accridition Details*/
       //Start
       var expiryDateRegD = 1566102022;
-     var InvestorGeolocationUSA = 91;
+     var InvestorGeolocationUSA = 1;
      var InvestorGeoLocationIndia = 91;
       var ipfsHash = "QmWDhue9iG8YJPh65TdD6zEYHZeeJKyVJC1e2uARwHGPC7";
-    instanceAcridetion.AddInvestorAccreditionDetails(FirstAccriditedInvestor,true,expiryDateRegD,InvestorGeolocationUSA,ipfsHash,{from: accounts[0]});
-    instanceAcridetion.AddInvestorAccreditionDetails(NewInvestorAcridited,true,expiryDateRegD,InvestorGeoLocationIndia,ipfsHash,{from: accounts[0]});
-    //instanceAcridetion.AddInvestorAccreditionDetails(NewInvestorNonAcridited,true,expiryDateRegD,InvestorGeoLocationIndia,ipfsHash,{from: accounts[0]});
+  // instanceAcridetion.AddInvestorAccreditionDetails(FirstAccriditedInvestor,true,expiryDateRegD,InvestorGeolocationUSA,ipfsHash,{from: accounts[0]});
+    //instanceAcridetion.AddInvestorAccreditionDetails(NewInvestorAcridited,true,expiryDateRegD,InvestorGeoLocationIndia,ipfsHash,{from: accounts[0]});
+ //  instanceAcridetion.AddInvestorAccreditionDetails(NewInvestorNonAcridited,true,expiryDateRegD,InvestorGeolocationUSA,ipfsHash,{from: accounts[0]});
     //Set GEO Location details 
-     var InvestorGeoLocationnew = 2;
-    instanceAcridetion.AddRegSInvestorDetails(NewInvestorNonAcridited,InvestorGeoLocationnew,ipfsHash,{from: accounts[0]} );
+     var InvestorGeoLocationne= 1;
+     var BuyerGeoLocation = 91;
+  instanceAcridetion.AddRegSInvestorDetails(FirstAccriditedInvestor,InvestorGeoLocationne,ipfsHash,{from: accounts[0]} );
+   instanceAcridetion.AddRegSInvestorDetails(NewInvestorNonAcridited,BuyerGeoLocation,ipfsHash,{from: accounts[0]} );
       //End
 
     	//End  //1534567000

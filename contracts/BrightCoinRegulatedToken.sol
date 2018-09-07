@@ -164,7 +164,7 @@ function transfer(address newInvestor, uint256 tokens) public returns (bool)
       //check if locking period is expired or not 
 
      //uint256 currenttime = now + 1 years;
-    uint256 currenttime = now;
+      uint256 currenttime = now;
 
     uint256 TokenLockExpiry =  AccreditationInfo.GetTokenLockExpiryDateTime(msg.sender,ICOType);
     if(currenttime < TokenLockExpiry)  // then it can only transfer token to Accriteded Investor only

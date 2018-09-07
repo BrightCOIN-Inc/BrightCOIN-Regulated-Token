@@ -27,7 +27,7 @@ contract BrightCoinERC20 is BrightCoinTokenOwner,TokenPreSaleDetails(msg.sender)
   string public constant TokenName = "TokenName"; // this is token name
   uint256 public constant decimals = 18; // decimal digit for token price calculation
   string public constant version = "1.0";
-  uint8 public constant ICOType = 1;   //0 for RegD , 1 for RegS and 2 for RedD & RegS and 3x means utility ICO
+  uint8 public constant ICOType = 3;   //0 for RegD , 1 for RegS and 2 for RedDRegS and 3 means utility ICO
   bool  internal isICOActive = true; 
   
   enum BrightCoinICOType { RegD, RegS, RegDRegS, Utility }
@@ -132,7 +132,7 @@ function UpdateTokenMintingOption(bool mintingOption) onlyTokenOwner(owner) publ
    totalSupply = initialSupply*(10**uint256(decimals));
 
    TotalAllocatedTeamToken = InitialAllocatedTeamToken*(10**uint256(decimals));
-   FounderToken = InitialFounderToken*(10**uint256(decimals));
+   //FounderToken = InitialFounderToken*(10**uint256(decimals));
    RewardsBountyToken = InitialRewardsBountyToken*(10**uint256(decimals));
    CompanyHoldingValue = InitialCompanyHoldingValue*(10**uint256(decimals));
    TotalAllocatedAdvisorToken = InitialAllocatedAdvisorToken*(10**uint256(decimals));
@@ -242,6 +242,34 @@ function totalSupply() public constant returns (uint256) {
 
     isICOActive = _status;
    }
+
+/*
+  
+   //ReleaseToken to Founder 
+   function ReleaseTokenToFounder(address founderAddress, uint256 currentDateTime)  onlyTokenOwner(owner) public returns(uint256)
+   {
+      uint256 tokenamount =  GetFounderToken(founderAddress,currentDateTime );
+      uint256 InitializedTokenAmount = tokenamount.mul(10**uint256(decimals));
+      return InitializedTokenAmount;
+   }
+*/
+   //ReleaseToken to Advisor
+   function ReleaseTokenToAdvisor(address AdvisorAddress, uint256 currentDateTime)  onlyTokenOwner(owner) public returns(uint256)
+   {
+      uint256 tokenamount =  GetAdvisorToken(AdvisorAddress,currentDateTime );
+      uint256 InitializedTokenAmount = tokenamount.mul(10**uint256(decimals));
+      return InitializedTokenAmount;
+   }
+
+    //ReleaseToken to Team
+   function ReleaseTokenToTeam(address TeamAddress, uint256 currentDateTime)  onlyTokenOwner(owner) public returns(uint256)
+   {
+      uint256 tokenamount =  GetTeamToken(TeamAddress,currentDateTime );
+      uint256 InitializedTokenAmount = tokenamount.mul(10**uint256(decimals));
+      return InitializedTokenAmount;
+   }
+
+   
   
 
 }

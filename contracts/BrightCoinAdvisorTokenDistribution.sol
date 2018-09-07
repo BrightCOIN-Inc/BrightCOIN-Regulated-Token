@@ -112,5 +112,17 @@ constructor(address _owner) public
 
  }
 
+function GetAdvisorToken(address NewAdvisorAddr, uint256 currentdatetime)  view internal  returns(uint256)
+{
+
+AdvisorDistribution storage AdvisorDetails = AdvisorDistributionDetails[NewAdvisorAddr];
+
+  //check if eligible for token
+  require(currentdatetime > AdvisorDetails.AdvisorDistributionAmountLockExpiryTime);
+
+   return AdvisorDetails.AdvisorDistributionAmount;
+}
+
+
 
  }
