@@ -1,16 +1,14 @@
 
 pragma solidity ^0.4.24;
 
-import "./BrightCoinTokenOwner.sol";
 
-contract BrightCoinTeamTokenDistribution is BrightCoinTokenOwner
+contract BrightCoinTeamTokenDistribution 
 {
 
 
-address owner;
-constructor(address _owner) public
+constructor() public
 {
-  owner = _owner;
+ 
 }
 //Team Distribution  
  //There might be multiple entry to this
@@ -30,34 +28,6 @@ constructor(address _owner) public
  mapping(address => TeamDistribution) TeamDistributionDetails;
  address[] public TeamTokenDetailsAddr;
  
- //Addng Details to Team Token
- function AddTeamInvestor(address NewTeamAddr,uint256 Tokenamount,uint256 TokenLockStartDateTime,uint256 TokenLockEndDateTime, bool partofTeam) onlyTokenOwner(owner) public {
-     
-  require(IsTokenAvailable(Tokenamount) == true);
-
-  TeamDistribution storage TeamDetails = TeamDistributionDetails[NewTeamAddr];
- // require(TeamDetails.partOfTeam == true);
-
-  if(TeamDetails.TeamDistributionIndex == false) //New Team
-  {
-    TeamDetails.TeamDistributionAddress = NewTeamAddr;
-    TeamDetails.TeamDistributionAmount = Tokenamount;
-    TeamDetails.TeamDistributionAmountLockStatrDateTime = TokenLockStartDateTime;
-    TeamDetails.TeamDistributionAmountLockExpiryDateTime = TokenLockEndDateTime;
-    TeamDetails.TeamActiveInvestor = partofTeam;
-    TeamDetails.TeamDistributionIndex = true;
-    TeamTokenDetailsAddr.push(NewTeamAddr);
-  }
-  else
-  {
-      //check if Team is Active
-      require(CheckIfTeamActive(NewTeamAddr) == true);
-      TeamDetails.TeamDistributionAmount += Tokenamount;
-      TeamDetails.TeamDistributionAmountLockStatrDateTime = TokenLockStartDateTime;
-      TeamDetails.TeamDistributionAmountLockExpiryDateTime = TokenLockEndDateTime;
-  }
-  
- }
 
  function RemoveTeamFromFurtherInvestment(address NewTeamAddr) public 
  {
@@ -104,7 +74,7 @@ constructor(address _owner) public
 
  }
 
-function GetTeamToken(address NewTeamAddr, uint256 currentdatetime)  view internal  returns(uint256)
+/*function GetTeamToken(address NewTeamAddr, uint256 currentdatetime)   internal  returns(uint256)
 {
 
 TeamDistribution storage TeamDetails = TeamDistributionDetails[NewTeamAddr];
@@ -114,6 +84,7 @@ TeamDistribution storage TeamDetails = TeamDistributionDetails[NewTeamAddr];
 
    return TeamDetails.TeamDistributionAmount;
 }
+*/
 
 
 

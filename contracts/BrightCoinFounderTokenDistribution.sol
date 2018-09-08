@@ -1,72 +1,42 @@
 pragma solidity ^0.4.24;
 
-import "./BrightCoinTokenOwner.sol";
 import "./SafeMath.sol";
 
-contract BrightCoinFounderTokenDistribution  is BrightCoinTokenOwner
+contract BrightCoinFounderTokenDistribution  
 {
 
-address owner;
+
 using SafeMath for uint;
 
-constructor(address _owner) public
+//There might be multiple entry to this
+uint256 public constant FounderToken = 100000;
+uint256 public TotalAllocatedFounder = 0;
+uint256 public CurrentAllocatedFounderToken = 0; //To be taken as it is 
+
+
+ struct FounderDistribution {
+       address FounderAddress;
+       uint256 FounderToken;
+       uint256 LockExpiryTime;
+       bool    FounderIndex;
+       bool    FounderActive;
+    }
+    
+ mapping(address => FounderDistribution) FounderTokenDetails;
+ address[] internal FounderAddrs;
+
+constructor() public
 {
-  owner = _owner;
+ 
 }
 
 
-   //There might be multiple entry to this
- uint256 public constant InitialAllocatedFounderToken = 100000;
- uint256 public TotalAllocatedFounderToken;
- uint256 public currentAllocatedFounderToken = 0; //To be taken as it is 
- 
- struct FounderDistribution {
-        address FounderAddress;
-        uint256 FounderToken;
-        uint256 LockExpiryDateTime;
-        bool    FounderDistrubutionIndex;
-        bool    FunderPartofTeam;
-    }
- mapping(address => FounderDistribution) FounderDistributionDetails;
- address[] public FounderDistributionAddr;
- 
-/*
-
- //Adding New Founder for Token Distribution
- function AddNewFounder(address NewFounder,uint256 Tokenamount,
-                    uint256 LockExpiryTime, bool PartofTeam)  onlyTokenOwner(owner)  public
-  {
-
-  	
-  		require(TokenAvailableForFounder(Tokenamount) == true);
-
-        FounderDistribution storage  FounderDetails = FounderDistributionDetails[NewFounder];
-
-        if(FounderDetails.FounderDistrubutionIndex == false)
-        {
-   		  FounderDetails.LockExpiryDateTime = LockExpiryTime;
-          FounderDetails.FunderPartofTeam = PartofTeam;
-          FounderDetails.FounderDistrubutionIndex = true;
-          FounderDistributionAddr.push(NewFounder);
-        }
-        else
-        {
-           require(CheckIfFounderActive(NewFounder) == true);
-                    
-            //Add new Token amount and Set new locking Period
-            FounderDetails.FounderToken  = FounderDetails.FounderToken.add(Tokenamount);
-            FounderDetails.LockExpiryDateTime = LockExpiryTime;
-        }
- 
- }
-
-
 //check if Founder Removed 
- function CheckIfFounderActive(address NewFounderAddr) view internal returns(bool)
+ function CheckIfFounderActive(address NewFounderAddr)  internal returns(bool)
  {
 
-   FounderDistribution storage founderDetails = FounderDistributionDetails[NewFounderAddr];
-  if(founderDetails.FunderPartofTeam == true)
+  FounderDistribution storage founderDetails = FounderTokenDetails[NewFounderAddr];
+ if(founderDetails.FounderActive == true)
   {
       return true;
   }
@@ -76,56 +46,67 @@ constructor(address _owner) public
  }
 
 
- //Check if token is available for further Distribution to Advisor
- function TokenAvailableForFounder(uint256 Tokenamount) internal returns(bool)
+ //Check if token is available for further Distribution to Founder
+ function TokenAvailableForFounder(uint256 TokenamountFounder)  internal  returns(bool)
  {
-    require(currentAllocatedFounderToken <=TotalAllocatedFounderToken);
-     require(currentAllocatedFounderToken.add(Tokenamount) <= TotalAllocatedFounderToken);
-     currentAllocatedFounderToken  =  currentAllocatedFounderToken.add(Tokenamount);
+    require(CurrentAllocatedFounderToken <=TotalAllocatedFounder);
+    require(CurrentAllocatedFounderToken.add(TokenamountFounder) <= TotalAllocatedFounder);
+     CurrentAllocatedFounderToken  =  CurrentAllocatedFounderToken.add(TokenamountFounder);
+
      
      return true;
  }
 
 
+
 //Remove Founder For Further Investment and from the Team
  function RemoveFounderFromFurtherInvestment(address NewFounderAddr)  public returns(bool)
  {
-    FounderDistribution storage newFounderDetails = FounderDistributionDetails[NewFounderAddr];
-    require(newFounderDetails.FounderDistrubutionIndex == true);
-    newFounderDetails.FunderPartofTeam = false;
+   FounderDistribution storage newFounderDetails = FounderTokenDetails[NewFounderAddr];
+   require(newFounderDetails.FounderIndex == true);
+   newFounderDetails.FounderActive = false;
+    
     return true;
 
  }
+ 
  
 
 //Count total no of Advisors
  function TotalFounder() public view returns(uint256) 
  {
-   return FounderDistributionAddr.length;
+   return FounderAddrs.length;
+  
  }
 
 
  //check Amount with Advisor
- function CheckFounderTokenAmount(address NewFounderAddr) view public returns(uint256)
+ function CheckFounderTokenAmount(address NewFounderAddr)  public returns(uint256)
  {
 
-  FounderDistribution storage FounderDetails = FounderDistributionDetails[NewFounderAddr];
-  require(FounderDetails.FounderDistrubutionIndex == true);
-        return FounderDetails.FounderToken;
+  FounderDistribution storage FounderDetails = FounderTokenDetails[NewFounderAddr];
+  require(FounderDetails.FounderIndex == true);
+       return FounderDetails.FounderToken;
+        
+        return 0;
  }
 
 
- function GetFounderToken(address NewFounderAddr, uint256 currentdatetime)  view internal  returns(uint256)
+ /*function GetFounderToken(address NewFounderAddr, uint256 currentdatetime)   internal  returns(uint256)
 {
-
-FounderDistribution storage FounderDetails = FounderDistributionDetails[NewFounderAddr];
+FounderDistribution storage FounderDetails = FounderTokenDetails[NewFounderAddr];
 
   //check if eligible for token
-  require(currentdatetime > FounderDetails.LockExpiryDateTime);
+ require(currentdatetime > FounderDetails.LockExpiryTime);
 
    return FounderDetails.FounderToken;
+  
 }
-
 */
 
- }
+
+
+}
+
+
+ 

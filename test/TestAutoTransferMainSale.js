@@ -30,17 +30,17 @@ contract('Testing AutoTransfer & Token  Distribution', (accounts) => {
 
 /*Set Token Amount for main Sale */
       var mainStartDate1 = 1536061800;
-      var mainSaleEndDate1 = 1536148200;
-      var MaCoinSold = 1000*(10**18);
+      var mainSaleEndDate1 = 1536977396;
+      var MaCoinSold = 10000*(10**18);
       var BonusDuringMainsale1 = 5000;
       var TokenLockinPerod1 = 1540000000;
       var PeriodActive1 = 1;
       var PeriodIndex1 = 1;
 
 
-      var mainStartDate2 = 1536234600;
-      var mainSaleEndDate2 = 1536321000;
-      var MaCoinSol2 = 100*(10**18);
+      var mainStartDate2 = 1537063796;
+      var mainSaleEndDate2 = 1538273396;
+      var MaCoinSol2 = 10000*(10**18);
       var BonusDuringMainsale2 = 0;
       var TokenLockinPerod2 = 1540000000;
       var PeriodActive2 = 1;
@@ -96,7 +96,7 @@ contract('Testing AutoTransfer & Token  Distribution', (accounts) => {
     AccountBal1  = await instance.balanceOf(account); 
    Transaction1  = await instance.sendTransaction({from:account,value:(0.5)*10**18});
     
-    DistributeToken = await instance.DistributeToken(account,1536061900,1566102023,1,{from: accounts[0]});
+    DistributeToken = await instance.DistributeToken(account,currenttime,1536977396,2,{from: accounts[0]});
 
   AccountBal2  = await instance.balanceOf(account);
    OwnerBal2  = await instance.balanceOf(owner);
@@ -130,27 +130,13 @@ contract('Testing AutoTransfer & Token  Distribution', (accounts) => {
    console.log(AccountBal1,"AccountBal1");
   console.log(AccountBal2, "AccountBal2");
   console.log(OwnerBal2, "OwnerBal2");
-    console.log(NewAccountBal1,"NewAccountBal1");
-  console.log(AccountBal3,"AccountBal3");
- // console.log(KYCCount,"KYC Count");
-  // console.log(AfterMintBal,"Post Mint Balance");
- //console.log(AccountBal4,"Post Burn Balance");
+  //  console.log(NewAccountBal1,"NewAccountBal1");
+  //console.log(AccountBal3,"AccountBal3");
+
 
 
    
-   
-   /* Transfer UseCase Log */
-   
-  // console.log(NewTransfer,"NewTransfer");
-
-  // console.log(TokenAmount, "Token amount post transfer");
-  //console.log(NewOwnerBal, "TokenAmountAfterDistributionOwnernewOwner");
-  //console.log(AccountBal,"TokenAmountAftertransferwnerAccount");
-
-
-
-// console.log(TokenTransfer,"Transaction Output");
-  // console.log(balanceAfterTransferAccount1,"balanceAfterTransferAccount1");
+ 
 
  
     })

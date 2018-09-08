@@ -1,4 +1,3 @@
-//var MyContract = artifacts.require("MyContract")
 var BrightCoinRegulatedToken = artifacts.require("./contracts/BrightCoinRegulatedToken.sol");
 var BrightCoinKYCContract = artifacts.require("./contracts/BrightCoinInvestorKYC.sol"); 
 var BrightCoinInvestorAccreditation = artifacts.require("./contracts/BrightCoinInvestorAccreditationCheck.sol"); 
@@ -7,7 +6,7 @@ var BrightCoinInvestorAccreditation = artifacts.require("./contracts/BrightCoinI
 //Check BalanceOF method for Different accounts.
 contract('Testing AutoTransfer & Token  Distribution', (accounts) => {
 
-   let instance
+  let instance
   let owner = accounts[0]
   let FirstAccriditedInvestor = accounts[1]
   let NewInvestorAcridited = 0x403f4fedf6127f30e77ae8295dea47eea0832899
@@ -52,14 +51,14 @@ contract('Testing AutoTransfer & Token  Distribution', (accounts) => {
      var InvestorGeolocationUSA = 1;
      var InvestorGeoLocationIndia = 91;
       var ipfsHash = "QmWDhue9iG8YJPh65TdD6zEYHZeeJKyVJC1e2uARwHGPC7";
-  // instanceAcridetion.AddInvestorAccreditionDetails(FirstAccriditedInvestor,true,expiryDateRegD,InvestorGeolocationUSA,ipfsHash,{from: accounts[0]});
-    //instanceAcridetion.AddInvestorAccreditionDetails(NewInvestorAcridited,true,expiryDateRegD,InvestorGeoLocationIndia,ipfsHash,{from: accounts[0]});
- //  instanceAcridetion.AddInvestorAccreditionDetails(NewInvestorNonAcridited,true,expiryDateRegD,InvestorGeolocationUSA,ipfsHash,{from: accounts[0]});
+   instanceAcridetion.AddInvestorAccreditionDetails(FirstAccriditedInvestor,true,expiryDateRegD,InvestorGeolocationUSA,ipfsHash,{from: accounts[0]});
+    instanceAcridetion.AddInvestorAccreditionDetails(NewInvestorAcridited,true,expiryDateRegD,InvestorGeoLocationIndia,ipfsHash,{from: accounts[0]});
+  instanceAcridetion.AddInvestorAccreditionDetails(NewInvestorNonAcridited,true,expiryDateRegD,InvestorGeolocationUSA,ipfsHash,{from: accounts[0]});
     //Set GEO Location details 
      var InvestorGeoLocationne= 1;
      var BuyerGeoLocation = 91;
-  instanceAcridetion.AddRegSInvestorDetails(FirstAccriditedInvestor,InvestorGeoLocationne,ipfsHash,{from: accounts[0]} );
-   instanceAcridetion.AddRegSInvestorDetails(NewInvestorNonAcridited,BuyerGeoLocation,ipfsHash,{from: accounts[0]} );
+  instanceAcridetion.AddNonAccredetedInvestorDetails(FirstAccriditedInvestor,InvestorGeoLocationne,ipfsHash,{from: accounts[0]} );
+  instanceAcridetion.AddNonAccredetedInvestorDetails(NewInvestorNonAcridited,InvestorGeolocationUSA,ipfsHash,{from: accounts[0]} );
       //End
 
     	//End  //1534567000
@@ -70,7 +69,14 @@ contract('Testing AutoTransfer & Token  Distribution', (accounts) => {
       console.log(OwnerBal1,"Initial Owner Balance");
       console.log(AccountBal1," Investor1 Balance");
 
-  Transaction1  = await instance.sendTransaction({from:FirstAccriditedInvestor,value:(2)*10**18});
+
+      var investorGeoLocation = await instanceAcridetion.GetGeoLocationOfInvestor(FirstAccriditedInvestor);
+         console.log(investorGeoLocation,"Investor1 Geolocation");
+
+         var investorGeoLocation1 = await instanceAcridetion.GetGeoLocationOfInvestor(NewInvestorNonAcridited);
+         console.log(investorGeoLocation1,"Investor2 Geolocation");
+
+ Transaction1  = await instance.sendTransaction({from:FirstAccriditedInvestor,value:(2)*10**18});
     
     //First datetime is current time and other id lock expiry
   DistributeToken = await instance.DistributeToken(FirstAccriditedInvestor,1536205322,1536566551,0,{from: accounts[0]});

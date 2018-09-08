@@ -22,7 +22,7 @@ import  "./BrightCoinInvestorAccreditationCheck.sol";
 
 */
 
-contract BrightCoinRegulatedToken  is BrightCoinERC20 
+contract BrightCoinRegulatedToken  is BrightCoinERC20(msg.sender)
 
 {
 
@@ -47,7 +47,7 @@ function GetCurrentTime() view public returns(uint256)
 //Calculate Token Amount to be Provided.   
 function calculateTokenmount()  private {
   
-
+    require(isICOActive == true);
    require(InvestorKYCInfo.CheckKYCStatus(msg.sender,now) == true);
     
     //On the Basis of ICO type we will have checks for specific Investor
@@ -136,8 +136,8 @@ function () external payable
                 uint256 bonusamount = GetBonusDetails(MainSalePeriodIndex);
                 uint256 FinalToken = InvestorBalances[AddrOfInvestor].add(bonusamount); 
                 //Need to check whether Token amount is in the range of current Main sale Period 
-                require(CheckMainSaleLimit(MainSalePeriodIndex,FinalToken) == true);
-               // require(CheckIfHardcapAchived(FinalToken) == true);
+               // require(CheckMainSaleLimit(MainSalePeriodIndex,FinalToken) == true);
+          
                 require(AccreditationInfo.checkInvestorValidity(AddrOfInvestor,currenttime,ICOType) == true);
                 AccreditationInfo.SetLockingPeriodAndToken(AddrOfInvestor,expiryDateTime,FinalToken,ICOType);
 
@@ -166,12 +166,20 @@ function transfer(address newInvestor, uint256 tokens) public returns (bool)
      //uint256 currenttime = now + 1 years;
       uint256 currenttime = now;
 
-    uint256 TokenLockExpiry =  AccreditationInfo.GetTokenLockExpiryDateTime(msg.sender,ICOType);
-    if(currenttime < TokenLockExpiry)  // then it can only transfer token to Accriteded Investor only
+    if( ICOType != 3)
     {
-      require(AccreditationInfo.checkBothInvestorValidity(msg.sender,newInvestor,currenttime, ICOType) == true); 
-      AccreditationInfo.SetLockingPeriodAndToken(newInvestor,TokenLockExpiry,tokens,ICOType);
-        
+      uint256 TokenLockExpiry =  AccreditationInfo.GetTokenLockExpiryDateTime(msg.sender,ICOType);
+      if(currenttime < TokenLockExpiry)  // then it can only transfer token to Accriteded Investor only
+      {
+        require(AccreditationInfo.checkBothInvestorValidity(msg.sender,newInvestor,currenttime, ICOType) == true); 
+        AccreditationInfo.SetLockingPeriodAndToken(newInvestor,TokenLockExpiry,tokens,ICOType);
+          
+      }
+    }
+    else
+    {
+        require(AccreditationInfo.checkBothInvestorValidity(msg.sender,newInvestor,currenttime, ICOType) == true); 
+
     }
 
     internaltransfer(newInvestor,tokens);
