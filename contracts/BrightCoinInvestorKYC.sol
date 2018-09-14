@@ -7,10 +7,10 @@ contract BrightCoinInvestorKYC is BrightCoinTokenOwner
 
 uint256 public constant Maximumcontributors = 100000; //Maximum no of Contributors
 
-address owner;
+
 constructor() public
 {
-  owner = msg.sender;
+
 }
     
 struct BrightCoinInvestorKYCstruct {
@@ -25,7 +25,7 @@ mapping(address => BrightCoinInvestorKYCstruct) BrightCoinInvestorKYCDetails;
 address[] public BrightCoinInvestorKYCAddr;
 
 function SetKYCDetailsofInvestor(address InvestordAddress,bool KYCStatus,
-                                uint256 KYCExpiryDateTime, string ipfsHashKYC) onlyTokenOwner(owner) public 
+                                uint256 KYCExpiryDateTime, string ipfsHashKYC) onlyTokenOwner public 
  {
          
       require( BrightCoinInvestorKYCAddr.length <= Maximumcontributors);
@@ -50,7 +50,7 @@ function CheckKYCStatus(address InvestordAddress,uint256 currentDateTime)  publi
 }
 
 function GetKYCDetails(address InvestordAddress)  public view returns(string)
-{
+{ 
     
     BrightCoinInvestorKYCstruct storage InvestorKYC = BrightCoinInvestorKYCDetails[InvestordAddress];
     return InvestorKYC.ipfsHashKYC;

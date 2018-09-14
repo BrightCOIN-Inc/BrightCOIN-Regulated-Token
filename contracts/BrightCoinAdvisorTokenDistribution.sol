@@ -3,7 +3,7 @@ pragma solidity ^0.4.24;
 import "./BrightCoinTokenOwner.sol";
 import "./SafeMath.sol";
 
-contract BrightCoinAdvisorTokenDistribution 
+contract BrightCoinAdvisorTokenDistribution  is BrightCoinTokenOwner
 {
 
 
@@ -30,6 +30,52 @@ constructor() public
  address[] public AdvisorDistributionAddr;
  
  
+ //Advisor Starts
+//Adding New Advisor for Token Distribution
+ function AddAdvisor(address NewAdvisor,uint256 Tokenamount,uint256 lockStartTime,
+                    uint256 LockExpiryTime, bool PartofTeam)  onlyTokenOwner public
+  {
+       require(TokenAvailableForAdvisor(Tokenamount) == true);
+
+        AdvisorDistribution storage  AdvisorDetails = AdvisorDistributionDetails[NewAdvisor];
+
+        if(AdvisorDetails.AdvisorDistrubutionIndex == false)
+        {
+          AdvisorDetails.AdvisorDistributionAddress = NewAdvisor;
+          AdvisorDetails.AdvisorDistributionAmount = Tokenamount;
+          AdvisorDetails.AdvisorDistributionAmountLockTime = lockStartTime;
+          AdvisorDetails.AdvisorDistributionAmountLockExpiryTime = LockExpiryTime;
+          AdvisorDetails.AdvisorpartofTeam = PartofTeam;
+          AdvisorDetails.AdvisorDistrubutionIndex = true;
+          AdvisorDistributionAddr.push(NewAdvisor);
+        }
+        else
+        {
+           require(CheckIfAdvisorActive(NewAdvisor) == true);
+                    
+            //Add new Token amount and Set new locking Period
+            AdvisorDetails.AdvisorDistributionAmount  = AdvisorDetails.AdvisorDistributionAmount.add(Tokenamount);
+            AdvisorDetails.AdvisorDistributionAmountLockTime = lockStartTime;
+            AdvisorDetails.AdvisorDistributionAmountLockExpiryTime = LockExpiryTime;
+        }
+
+ 
+ }
+
+
+ //Remove Advisor For Further Investment and from the Team
+ function RemoveAdvisorFromFurtherInvestment(address NewAdvisorAddr) onlyTokenOwner public returns(bool)
+ {
+    AdvisorDistribution storage newAdvisorDetails = AdvisorDistributionDetails[NewAdvisorAddr];
+    require(newAdvisorDetails.AdvisorDistrubutionIndex == true);
+    newAdvisorDetails.AdvisorpartofTeam = false;
+    return true;
+
+
+
+ }
+
+ //Ends
  
  //Check if token is available for further Distribution to Advisor
  function TokenAvailableForAdvisor(uint256 Tokenamount) internal returns(bool)

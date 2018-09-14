@@ -1,8 +1,9 @@
 
 pragma solidity ^0.4.24;
 
+import "./BrightCoinTokenOwner.sol";
 
-contract BrightCoinTeamTokenDistribution 
+contract BrightCoinTeamTokenDistribution  is BrightCoinTokenOwner
 {
 
 
@@ -10,6 +11,7 @@ constructor() public
 {
  
 }
+
 //Team Distribution  
  //There might be multiple entry to this
  uint256 public constant InitialAllocatedTeamToken = 100000;  // Token token allocated for Team distribution
@@ -29,12 +31,44 @@ constructor() public
  address[] public TeamTokenDetailsAddr;
  
 
- function RemoveTeamFromFurtherInvestment(address NewTeamAddr) public 
+ //Team Token Distribution  Starts
+
+//Addng Details to Team Token
+ function AddTeamInvestor(address NewTeamAddr,uint256 Tokenamount,uint256 TokenLockStartDateTime,uint256 TokenLockEndDateTime, bool partofTeam) onlyTokenOwner  public {
+     
+  require(IsTokenAvailable(Tokenamount) == true);
+  TeamDistribution storage TeamDetails = TeamDistributionDetails[NewTeamAddr];
+ // require(TeamDetails.partOfTeam == true);
+
+  if(TeamDetails.TeamDistributionIndex == false) //New Team
+  {
+    TeamDetails.TeamDistributionAddress = NewTeamAddr;
+    TeamDetails.TeamDistributionAmount = Tokenamount;
+    TeamDetails.TeamDistributionAmountLockStatrDateTime = TokenLockStartDateTime;
+    TeamDetails.TeamDistributionAmountLockExpiryDateTime = TokenLockEndDateTime;
+    TeamDetails.TeamActiveInvestor = partofTeam;
+    TeamDetails.TeamDistributionIndex = true;
+    TeamTokenDetailsAddr.push(NewTeamAddr);
+  }
+  else
+  {
+      //check if Team is Active
+      require(CheckIfTeamActive(NewTeamAddr) == true);
+      TeamDetails.TeamDistributionAmount += Tokenamount;
+      TeamDetails.TeamDistributionAmountLockStatrDateTime = TokenLockStartDateTime;
+      TeamDetails.TeamDistributionAmountLockExpiryDateTime = TokenLockEndDateTime;
+  }
+  
+ }
+
+ function RemoveTeamFromFurtherInvestment(address NewTeamAddr) onlyTokenOwner public 
  {
     TeamDistribution storage TeamDetails = TeamDistributionDetails[NewTeamAddr];
     TeamDetails.TeamActiveInvestor = false;
 
  }
+
+//ENDS
  
  function IsTokenAvailable(uint256 Tokenamount) public returns(bool)
  {

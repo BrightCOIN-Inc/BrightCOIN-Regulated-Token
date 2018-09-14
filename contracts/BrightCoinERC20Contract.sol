@@ -9,7 +9,7 @@ import "./SafeMath.sol";
 
 
 
-contract BrightCoinERC20 is TokenPreSaleDetails(msg.sender),TokenMainSaleDetails(msg.sender) ,BrightCoinTokenDistributionDetails(msg.sender)
+contract BrightCoinERC20 is TokenPreSaleDetails,TokenMainSaleDetails, BrightCoinTokenDistributionDetails
 {
   using SafeMath for uint;
 
@@ -42,7 +42,7 @@ contract BrightCoinERC20 is TokenPreSaleDetails(msg.sender),TokenMainSaleDetails
   //Purchase Rate
   //purchase rate can be changed by the Owner
   uint256 public purchaseRate = 1000;
-  function setPurchaseRate(uint newRate) public onlyTokenOwner(owner) {
+  function setPurchaseRate(uint newRate) public onlyTokenOwner {
         require(purchaseRate != newRate);
         purchaseRate = newRate;
     }
@@ -52,38 +52,37 @@ contract BrightCoinERC20 is TokenPreSaleDetails(msg.sender),TokenMainSaleDetails
     Soft cap is the minimal amount required by your project, to make it viable, in order to continue. If you do not reach that amount during your ICO then you should allow your investors to refund their money using a push/ pull mechanism.
  */
   uint internal ICOSoftCap = 1000000; //Minimum Eather to Reach
-  //uint internal ICOHardCap = 7*(10**6)*(10**uint256(decimals));  //Maximum Ether to Reach
   uint internal ICOHardCap = 20000;
 
 
-  function ChangeSoftCap(uint newSoftCap) public onlyTokenOwner(owner) {
+  function ChangeSoftCap(uint newSoftCap) public onlyTokenOwner {
         require(ICOSoftCap != newSoftCap);
         require(newSoftCap < totalSupply);
         ICOSoftCap = newSoftCap;
       
     }
-    function ChangeHardCap(uint newHardCap) public onlyTokenOwner(owner) {
+    function ChangeHardCap(uint newHardCap) public onlyTokenOwner {
         require(ICOHardCap != newHardCap);
         require(newHardCap < totalSupply);
         ICOHardCap = newHardCap;
       
     }
 
-    function GetSoftCap() onlyTokenOwner(owner) view public  returns(uint256) {
+    function GetSoftCap() onlyTokenOwner view public  returns(uint256) {
 
       return ICOSoftCap;
     }
 
-     function GetHardCap()  onlyTokenOwner(owner) view public returns(uint256) {
+     function GetHardCap()  onlyTokenOwner view public returns(uint256) {
 
       return ICOHardCap;
     }
 
     //Check if softcap reached
-    function CheckIfSoftCapReached() onlyTokenOwner(owner)   internal  view returns(bool)
+    function CheckIfSoftCapReached() onlyTokenOwner   internal  view returns(bool)
     {
 
-      uint tokenSold = totalSupply.sub(balances[owner]);
+      uint tokenSold = totalSupply.sub(balances[owner()]);
 
         if(tokenSold > ICOSoftCap)
           return true;
@@ -95,7 +94,8 @@ contract BrightCoinERC20 is TokenPreSaleDetails(msg.sender),TokenMainSaleDetails
     //check if HARD Cap Achived
     function CheckIfHardcapAchived(uint256 tokens)  internal view returns(bool)
     {
-      uint tokenSold = totalSupply.sub(balances[owner]);
+   
+      uint tokenSold = totalSupply.sub(balances[owner()]);
       require(tokenSold <= ICOHardCap);
       require(tokenSold.add(tokens) <=ICOHardCap);
       return true;
@@ -105,8 +105,8 @@ contract BrightCoinERC20 is TokenPreSaleDetails(msg.sender),TokenMainSaleDetails
     
   
   //Investment storage address
-  address public FundDepositAddress = 0x403f4fedf6127f30e77ae8295dea47eea0832899; //Should be taken from Script 
-  function ChangeFundDepositAddress(address NewFundDepositAddress) onlyTokenOwner(owner) public {
+  address public FundDepositAddress = 0x9750aa30a3281df657d8b08499e1b5dbc90e0b5f; //Should be taken from Script 
+  function ChangeFundDepositAddress(address NewFundDepositAddress) onlyTokenOwner public {
     require( FundDepositAddress != NewFundDepositAddress );
     FundDepositAddress = NewFundDepositAddress;
   }
@@ -114,7 +114,7 @@ contract BrightCoinERC20 is TokenPreSaleDetails(msg.sender),TokenMainSaleDetails
 
 //option for Minting more token 
 bool public MintMoreTokens  = false;
-function UpdateTokenMintingOption(bool mintingOption) onlyTokenOwner(owner) public {
+function UpdateTokenMintingOption(bool mintingOption) onlyTokenOwner public {
   
   MintMoreTokens = mintingOption;
 }
@@ -128,21 +128,21 @@ function UpdateTokenMintingOption(bool mintingOption) onlyTokenOwner(owner) publ
  //////////////////////////////////////////
   
  
-  constructor (address _owner) public{
+  constructor () public{
 
    totalSupply = initialSupply*(10**uint256(decimals));
 
-   //TotalAllocatedTeamToken = InitialAllocatedTeamToken*(10**uint256(decimals));
-   //FounderToken = InitialFounderToken*(10**uint256(decimals));
+   TotalAllocatedTeamToken = InitialAllocatedTeamToken*(10**uint256(decimals));
+   TotalAllocatedFounder = InitialFounderToken*(10**uint256(decimals));
+   TotalAllocatedAdvisorToken = InitialAllocatedAdvisorToken*(10**uint256(decimals));
    RewardsBountyToken = InitialRewardsBountyToken*(10**uint256(decimals));
    CompanyHoldingValue = InitialCompanyHoldingValue*(10**uint256(decimals));
-   //TotalAllocatedAdvisorToken = InitialAllocatedAdvisorToken*(10**uint256(decimals));
-   ICOHardCap = ICOHardCap*(10**uint256(decimals));
+   
 
-    balances[msg.sender] = totalSupply;
-    BountyDistriuted = 0;
+   ICOHardCap = ICOHardCap*(10**uint256(decimals));
+   balances[msg.sender] = totalSupply;
+   BountyDistriuted = 0;
  
-    owner = _owner;
   }
 
  
@@ -197,16 +197,16 @@ function totalSupply() public constant returns (uint256) {
     /// @notice Will cause a certain `_value` of coins minted for `_to`.
     /// @param _to The address that will receive the coin.
     /// @param _value The amount of coin they will receive.
-    function mint(address _to, uint _value) onlyTokenOwner(owner) public {
-        require(msg.sender == owner); // assuming you have a contract owner
+    function mint(address _to, uint _value) onlyTokenOwner public {
+       // assuming you have a contract owner
         mintToken(_to, _value);
     }
 
     /// @notice Will allow multiple minting within a single call to save gas.
     /// @param recipients A list of addresses to mint for.
     /// @param _values The list of values for each respective `_to` address.
-    function airdropMinting(address[] recipients, uint256[] _values) onlyTokenOwner(owner) public {
-        require(msg.sender == owner); // assuming you have a contract owner
+    function airdropMinting(address[] recipients, uint256[] _values) onlyTokenOwner public {
+        // assuming you have a contract owner
         require(recipients.length == _values.length);
         for (uint i = 0; i < recipients.length; i++) {
 
@@ -226,7 +226,7 @@ function totalSupply() public constant returns (uint256) {
 
     /// @notice it will burn all the token passed as parameter.
     /// @param _value Value of token to be burnt
-   function burn(uint256 _value) onlyTokenOwner(owner) public {
+   function burn(uint256 _value) onlyTokenOwner public {
     require(_value > 0);
     require(_value <= balances[msg.sender]);
     // no need to require value <= totalSupply, since that would imply the
@@ -240,15 +240,51 @@ function totalSupply() public constant returns (uint256) {
 
 
    //Owner of ICO can anytime Stop the ICO post that no any transaction will happen
-   function StopICO(bool _status) onlyTokenOwner(owner) public {
+   function StopICO(bool _status) onlyTokenOwner public {
 
     isICOActive = _status;
    }
 
 
+//ReleaseToken to Founder 
+   function ReleaseTokenToFounder(address founderAddress, uint256 currentDateTime)  onlyTokenOwner public returns(uint256)
+   {
+      FounderDistribution storage FounderDetails = FounderTokenDetails[founderAddress];
+
+      //check if eligible for token
+      require(currentDateTime > FounderDetails.LockExpiryTime);
+      return FounderDetails.FounderToken;
+   }
+ 
+   
+
+   //ReleaseToken to Advisor
+   function ReleaseTokenToAdvisor(address AdvisorAddress, uint256 currentDateTime)  onlyTokenOwner public returns(uint256)
+   {
+     AdvisorDistribution storage AdvisorDetails = AdvisorDistributionDetails[AdvisorAddress];
+    //check if eligible for token
+      require(currentDateTime > AdvisorDetails.AdvisorDistributionAmountLockExpiryTime);
+     return AdvisorDetails.AdvisorDistributionAmount;
+   }
+   
+
+    //ReleaseToken to Team
+   function ReleaseTokenToTeam(address TeamAddress, uint256 currentDateTime)  onlyTokenOwner public returns(uint256)
+   {
+      TeamDistribution storage TeamDetails = TeamDistributionDetails[TeamAddress];
+     //check if eligible for token
+      require(currentDateTime > TeamDetails.TeamDistributionAmountLockExpiryDateTime);
+      return TeamDetails.TeamDistributionAmount;
+   }
   
    
 
+
+  function ReleaseCompanyHoldingTokens(uint256 currentdatetime)  onlyTokenOwner public returns(uint256)
+  { 
+    require(currentdatetime > CompanyHoldinglockingPeriod);
+    return CompanyHoldingValue; 
+}
    
   
 

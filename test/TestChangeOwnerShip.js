@@ -70,66 +70,55 @@ contract('Testing AutoTransfer & Token  Distribution', (accounts) => {
 
 
     	//End  //1534567000
-   // currenttime  = await instance.GetCurrentTime();
     OwnerBal1 = await instance.balanceOf(owner);  //100,000
     AccountBal1  = await instance.balanceOf(accounts[2]);  //0 
 
-      console.log(OwnerBal1,"Initial Owner Balance");
-      console.log(AccountBal1," Investor1 Balance");
+    console.log(OwnerBal1,"Initial Owner Balance");
+    console.log(AccountBal1," Investor1 Balance");
 
 
-     // var investorGeoLocation = await instanceAcridetion.GetGeoLocationOfInvestor(FirstAccriditedInvestor);
-       //  console.log(investorGeoLocation,"Investor1 Geolocation");
+     //Change OwnerShip
 
-         //var investorGeoLocation1 = await instanceAcridetion.GetGeoLocationOfInvestor(NewInvestorNonAcridited);
-         //console.log(investorGeoLocation1,"Investor2 Geolocation");
+   // OwnerShipChange =   instance.transferOwnership(accounts[2],{from: accounts[0]});
 
- Transaction1  = await instance.sendTransaction({from:accounts[2],value:(2)*10**18});
+      //Now try with Prevous owner
+
+    //OwnerShipChange1 =   instance.transferOwnership(accounts[0],{from: accounts[2]});
+
+    var OwnerAddr1 = await instance.owner();
+    console.log(OwnerAddr1,"Owner Addres before Transfer");
+    console.log(accounts[0],"Owner Addres before Transfer from Accounts" );
+
+    OwnerShipChange =  await  instance.transferOwnership(accounts[2],{from: accounts[0]});
+
+    OwnerShipChange =  await  instance.transferOwnership(accounts[0],{from: accounts[2]});
+
+    var OwnerAddr2 = await instance.owner();
+    console.log(OwnerAddr2,"Owner Addres after Transfer");
+    console.log(accounts[2],"Owner Addres after Transfer from Accounts2" );
+
+
+
+    Transaction1  = await instance.sendTransaction({from:accounts[1],value:(2)*10**18});
     
     //First datetime is current time and other id lock expiry
-  DistributeToken = await instance.DistributeToken(accounts[2],1536205322,1536566551,0,{from: accounts[0]});
+    DistributeToken = await instance.DistributeToken(accounts[1],1536205322,1536566551,0,{from: accounts[0]});
 
-  AccountBal2  = await instance.balanceOf(accounts[2]);  //2000
-   OwnerBal2  = await instance.balanceOf(owner);    //980000
+   AccountBal2  = await instance.balanceOf(accounts[1]);  //2000
+    OwnerBal2  = await instance.balanceOf(accounts[0]);    //980000
     
-    console.log(AccountBal2,"Investor1 balance Post Auto Transfer");
-     console.log(OwnerBal2,"Owner Balance Post Auto Transfer");
+   console.log(AccountBal2,"Investor1 balance Post Auto Transfer");
+    console.log(OwnerBal2,"Owner Balance Post Auto Transfer");
 
     //Now Transfer this token to New Investor	
 
- NewTransfer   = instance.transfer(accounts[1],50*(10**18) ,{from: accounts[2]});
- NewAccountBal1  = await instance.balanceOf(accounts[2]);
-  AccountBal3  = await instance.balanceOf(accounts[1]);
+   //NewTransfer   = instance.transfer(accounts[1],50*(10**18) ,{from: accounts[1]});
+   //NewAccountBal1  = await instance.balanceOf(accounts[2]);
+   //AccountBal3  = await instance.balanceOf(accounts[1]);
   
- console.log(NewAccountBal1," new Investor in New Account");
-console.log(AccountBal3," Investor balance post Transfer");
+   //console.log(NewAccountBal1," new Investor in New Account");
+   //console.log(AccountBal3," Investor balance post Transfer");
 
-
-      //New Investor want to Buy Token
-
-   //  var Transaction2  = await instance.sendTransaction({from:NewInvestor,value:(1)*10**18});
-    
-    //First datetime is current time and other id lock expiry
-  //var DistributeToken1 = await instance.DistributeToken(NewInvestor,1536205322,1536566551,0,{from: accounts[0]});
-
- //var AccountBal3  = await instance.balanceOf(NewInvestor);  //2000
- // var OwnerBal3  = await instance.balanceOf(owner);    //980000
-
-  // console.log(AccountBal3," Brand New Investor Token Amount");
-     // console.log(OwnerBal3," Owner Balance Post Brand New Investor");
-      
-
-   //End
-
-  //Now Mint the token
-
-    // mint = await instance.mint(owner,2000*(10**18),{from: accounts[0]});
-     // AfterMintBal = await instance.balanceOf(owner);
-
-
-   //Now Test Burn Token
-   //  burn = await instance.burn(1000*(10**18),{from: accounts[0]});
-     // AccountBal4  = await instance.balanceOf(owner);
 
 
     } 
@@ -137,33 +126,7 @@ console.log(AccountBal3," Investor balance post Transfer");
       console.log(e + ` Exception Test Auto Transfer`)
     }
 
-   /* console.log(currenttime,"currenttime");
-   console.log(OwnerBal1,"OwnerBal1");
-   console.log(AccountBal1,"AccountBal1");
-  console.log(AccountBal2, "AccountBal2");
-  console.log(OwnerBal2, "OwnerBal2");
-    console.log(NewAccountBal1,"NewAccountBal1");
-  console.log(AccountBal3,"AccountBal3");
-  console.log(KYCCount,"KYC Count");
-   console.log(AfterMintBal,"Post Mint Balance");
- console.log(AccountBal4,"Post Burn Balance");
 
-*/
-
-   
-   
-   /* Transfer UseCase Log */
-   
-  // console.log(NewTransfer,"NewTransfer");
-
-  // console.log(TokenAmount, "Token amount post transfer");
-  //console.log(NewOwnerBal, "TokenAmountAfterDistributionOwnernewOwner");
-  //console.log(AccountBal,"TokenAmountAftertransferwnerAccount");
-
-
-
-// console.log(TokenTransfer,"Transaction Output");
-  // console.log(balanceAfterTransferAccount1,"balanceAfterTransferAccount1");
 
  
     })

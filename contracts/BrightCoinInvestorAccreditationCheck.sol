@@ -45,15 +45,15 @@ import "./BrightCoinAccreditionInvestor.sol";
 
 
 
-contract BrightCoinInvestorAccreditationCheck is BrightCoinAccreditionInvestor(msg.sender),BrightCoinNonAccridetednvestor(msg.sender)
+contract BrightCoinInvestorAccreditationCheck is BrightCoinAccreditionInvestor,BrightCoinNonAccridetednvestor
 {
 
 enum BrightCoinICOType { RegD, RegS, RegDRegS, Utility }
 
-address owner;
+
 constructor() public
 {
-  owner = msg.sender;
+  
 }
 
 

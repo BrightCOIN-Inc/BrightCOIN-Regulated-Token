@@ -13,11 +13,10 @@ contract BrightCoinNonAccridetednvestor is BrightCoinTokenOwner
 {
 
 
-address owner;
 using SafeMath for uint;
-constructor(address _owner) public
+constructor() public
 {
-  owner = _owner;
+ 
 }
   /////////////////////////////////////////////
 
@@ -34,7 +33,7 @@ constructor(address _owner) public
     address[] public NonAccredetedInvestors;
 
     /*Function to Add Investor details*/
-     function  AddNonAccredetedInvestorDetails(address Investoraddr,uint256 InvestorGeoLocation, string ipfsHashRegSInvestor )onlyTokenOwner(owner) public {
+     function  AddNonAccredetedInvestorDetails(address Investoraddr,uint256 InvestorGeoLocation, string ipfsHashRegSInvestor )onlyTokenOwner public {
       
       require(Investoraddr != 0x0);
 

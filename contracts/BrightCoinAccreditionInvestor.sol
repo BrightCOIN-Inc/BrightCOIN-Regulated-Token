@@ -17,10 +17,10 @@ using SafeMath for uint;
 uint256 public  TotalInvestmentCurrently;
 uint256 public constant USAGeoLocation = 1;
 
-address owner;
-constructor(address _owner) public
+
+constructor() public
 {
-  owner = _owner;
+  //owner = _owner;
 }
 
 struct AccreditedInvestor
@@ -40,7 +40,7 @@ struct AccreditedInvestor
 
      /* Function to Add Investor details*/
      function  AddInvestorAccreditionDetails(address Investoraddr,bool AccreditionStatus,uint256 AccreditionExpiryDateTime,uint256 InvestorGeoLocation, string ipfsHashRegDInvestor )
-      onlyTokenOwner(owner) public {
+      onlyTokenOwner public {
       
       require(Investoraddr != 0x0);
       require(AccreditionExpiryDateTime > 0);
@@ -68,8 +68,8 @@ struct AccreditedInvestor
  }
 
 
-
- function CheckAccreditionStatus( address AccreditedInvestoraddr, uint256 currentdatetime)  view internal returns(bool)
+ function CheckAccreditionStatus( address AccreditedInvestoraddr, uint256 currentdatetime)  view internal 
+ returns(bool)
  {
 
     if((currentdatetime > 0) && (AccreditedInvestoraddr != 0x0))

@@ -7,12 +7,11 @@ import "./SafeMath.sol";
 contract TokenPreSaleDetails is BrightCoinTokenOwner
 {
 
-    address owner;
+    //address owner;
     using SafeMath for uint;
 
-    constructor(address _owner) public
+    constructor() public
     {
-      owner = _owner;
     }
 
   
@@ -30,7 +29,7 @@ contract TokenPreSaleDetails is BrightCoinTokenOwner
     uint256 internal ICOendDate = 1566102022;     //22/12/2018
  
      //Function for changing the startDate of Presale
-    function changeStartDate(uint256 startDateTimeStamp) onlyTokenOwner(owner) public returns(bool){
+    function changeStartDate(uint256 startDateTimeStamp) onlyTokenOwner public returns(bool){
 
     require(ICOstartDate > now);
     require( startDateTimeStamp < ICOendDate );
@@ -39,7 +38,7 @@ contract TokenPreSaleDetails is BrightCoinTokenOwner
   }
 
     //Function for changing the endDate of Presale
-    function changeEndDate(uint256 endDateTimeStamp) onlyTokenOwner(owner) public returns(bool) 
+    function changeEndDate(uint256 endDateTimeStamp) onlyTokenOwner public returns(bool) 
     {
       require(ICOendDate > now);
       require( endDateTimeStamp > ICOstartDate );
@@ -57,7 +56,7 @@ contract TokenPreSaleDetails is BrightCoinTokenOwner
 
      //Check if presale is ON
      bool public PreSaleOn = true; 
-     function changePresaleStatus(bool presalestatus) onlyTokenOwner(owner) public
+     function changePresaleStatus(bool presalestatus) onlyTokenOwner public
      {
        PreSaleOn = presalestatus;
      }
@@ -79,16 +78,16 @@ struct MainSaleTokenDistrubution
     uint8 PeriodIndex;
 }
 
- address owner;
-constructor(address _owner) public
+ //address owner;
+constructor() public
 {
-  owner = _owner;
+ 
 }
 
 mapping(uint256 => MainSaleTokenDistrubution) MainSaleCountMapping;
 uint8[] internal  mainSaleToken;
 
-function AddMainSalePeriod(uint256 mainStartDate,uint256 mainSaleEndDate,uint256 TokenLockinPeriod,uint256 MaxCoinSold,uint256 BonusDuringMainsale,uint8 PeriodIndex, bool PeriodActive) onlyTokenOwner(owner) public   returns(bool)
+function AddMainSalePeriod(uint256 mainStartDate,uint256 mainSaleEndDate,uint256 TokenLockinPeriod,uint256 MaxCoinSold,uint256 BonusDuringMainsale,uint8 PeriodIndex, bool PeriodActive) onlyTokenOwner public   returns(bool)
    {
 
       MainSaleTokenDistrubution storage mainSale = MainSaleCountMapping[PeriodIndex];
@@ -108,7 +107,7 @@ function AddMainSalePeriod(uint256 mainStartDate,uint256 mainSaleEndDate,uint256
                             
 
   //Function for changing the startDate of ICO
- function CheckTokenPeriodSale(uint256 DateTimeStamp, uint8 PeriodIndex) onlyTokenOwner(owner) public view returns(bool) {
+ function CheckTokenPeriodSale(uint256 DateTimeStamp, uint8 PeriodIndex) onlyTokenOwner public view returns(bool) {
 
         MainSaleTokenDistrubution storage MainSaleTokenSale = MainSaleCountMapping[PeriodIndex];
        require(MainSaleTokenSale.mainStartDate !=0);
@@ -122,7 +121,7 @@ function AddMainSalePeriod(uint256 mainStartDate,uint256 mainSaleEndDate,uint256
   }
 
   //Function for getting bonus details
- function GetBonusDetails(uint8 PeriodIndex) onlyTokenOwner(owner) public view returns(uint256) {
+ function GetBonusDetails(uint8 PeriodIndex) onlyTokenOwner public view returns(uint256) {
 
         MainSaleTokenDistrubution storage MainSaleToken = MainSaleCountMapping[PeriodIndex];
         return MainSaleToken.BonusDuringMainsale;
@@ -130,7 +129,7 @@ function AddMainSalePeriod(uint256 mainStartDate,uint256 mainSaleEndDate,uint256
   }
 
   //EndToken Mail Sale Abruptly
-  function EndMainSale(uint8 PeriodIndex) onlyTokenOwner(owner) public
+  function EndMainSale(uint8 PeriodIndex) onlyTokenOwner public
   {
 
   MainSaleTokenDistrubution storage MainSaleTokenSale = MainSaleCountMapping[PeriodIndex];
