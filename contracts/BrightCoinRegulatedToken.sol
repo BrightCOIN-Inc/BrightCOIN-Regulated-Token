@@ -76,7 +76,7 @@ function calculateTokenmount()  private {
 
         require(CheckIfHardcapAchived(tokens) == true);
 
-         InvestorBalances[msg.sender] = tokens;   
+         InvestorBalances[msg.sender] =  InvestorBalances[msg.sender].add(tokens);   
           CalculatetokenWithMailSalePeriod[msg.sender] = false;
           
 
@@ -85,7 +85,7 @@ function calculateTokenmount()  private {
     {
       
        uint256 mainSaleToken = purchaseRate.mul(msg.value);
-       require(CheckIfHardcapAchived(mainSaleToken) == true);
+      // require(CheckIfHardcapAchived(mainSaleToken) == true);
        InvestorBalances[msg.sender] = mainSaleToken;  
         CalculatetokenWithMailSalePeriod[msg.sender] = true;
 

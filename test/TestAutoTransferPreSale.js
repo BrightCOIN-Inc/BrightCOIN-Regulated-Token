@@ -85,7 +85,7 @@ contract('Testing AutoTransfer & Token  Distribution', (accounts) => {
          //console.log(investorGeoLocation1,"Investor2 Geolocation");
 
  Transaction1  = await instance.sendTransaction({from:accounts[2],value:(2)*10**18});
-    
+  Transaction1  = await instance.sendTransaction({from:accounts[2],value:(5)*10**18});
     //First datetime is current time and other id lock expiry
   DistributeToken = await instance.DistributeToken(accounts[2],1536205322,1536566551,0,{from: accounts[0]});
 
