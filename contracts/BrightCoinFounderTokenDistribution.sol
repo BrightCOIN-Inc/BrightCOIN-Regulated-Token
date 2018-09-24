@@ -75,7 +75,7 @@ function AddNewFounder(address newFounder,uint256 FounderToken,uint256 LockExpir
 //ENDS
 
 //check if Founder Removed 
- function CheckIfFounderActive(address NewFounderAddr)  internal returns(bool)
+ function CheckIfFounderActive(address NewFounderAddr) view internal returns(bool)
  {
 
   FounderDistribution storage founderDetails = FounderTokenDetails[NewFounderAddr];
@@ -111,7 +111,7 @@ function AddNewFounder(address newFounder,uint256 FounderToken,uint256 LockExpir
 
 
  //check Amount with Advisor
- function CheckFounderTokenAmount(address NewFounderAddr)  public returns(uint256)
+ function CheckFounderTokenAmount(address NewFounderAddr) view public returns(uint256)
  {
 
   FounderDistribution storage FounderDetails = FounderTokenDetails[NewFounderAddr];

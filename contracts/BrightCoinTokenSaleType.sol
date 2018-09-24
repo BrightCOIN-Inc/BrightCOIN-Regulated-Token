@@ -153,7 +153,7 @@ function AddMainSalePeriod(uint256 mainStartDate,uint256 mainSaleEndDate,uint256
      return mainSaleToken.length;
   }
 
-  function CheckMainSaleLimit( uint8 periodIndex, uint256 tokenamount) returns(bool)
+  function CheckMainSaleLimit( uint8 periodIndex, uint256 tokenamount) view public returns(bool)
   {
 
     MainSaleTokenDistrubution storage MainSaleTokenSale = MainSaleCountMapping[periodIndex];

@@ -38,7 +38,16 @@ function SetKYCDetailsofInvestor(address InvestordAddress,bool KYCStatus,
  
        BrightCoinInvestorKYCAddr.push(InvestordAddress);
    }
-   
+
+  function SetKYCStatus(address InvestorAddress, bool kycStatus) onlyTokenOwner public 
+  {
+
+    require(InvestorAddress != 0x0);
+
+    BrightCoinInvestorKYCstruct storage InvestorKYC = BrightCoinInvestorKYCDetails[InvestorAddress];
+    InvestorKYC.KYCStatus = kycStatus;
+
+  }
 function CheckKYCStatus(address InvestordAddress,uint256 currentDateTime)  public view returns(bool)
 {
     require(InvestordAddress != 0x0);
@@ -49,12 +58,23 @@ function CheckKYCStatus(address InvestordAddress,uint256 currentDateTime)  publi
     return InvestorKYC.KYCStatus;
 }
 
+
+
 function GetKYCDetails(address InvestordAddress)  public view returns(string)
 { 
     
     BrightCoinInvestorKYCstruct storage InvestorKYC = BrightCoinInvestorKYCDetails[InvestordAddress];
     return InvestorKYC.ipfsHashKYC;
 }
+
+
+function SetKYCExpiryDateTime(address InvestordAddress,uint256 expiryDateTime)  onlyTokenOwner public 
+{
+
+     require(InvestordAddress != 0x0);
+    require(expiryDateTime != 0);
+    BrightCoinInvestorKYCstruct storage InvestorKYC = BrightCoinInvestorKYCDetails[InvestordAddress];
+    InvestorKYC.KYCExpiryDateTime = expiryDateTime;
 
 function GetKYCExpiryDate(address InvestordAddress)  public view returns(uint256)
 {
