@@ -4,12 +4,19 @@ pragma solidity ^0.4.24;
 import "./BrightCoinTokenOwner.sol";
 import "./BrightCoinERC20ContractInterface.sol";
 import "./BrightCoinTokenSaleType.sol";
-import "./BrightCoinTokenDistributionDetails.sol";
+import "./BrightCoinAdminTokenDistributionDetails.sol";
 import "./SafeMath.sol";
+import "./BrightCoinInvestorTokenLock.sol";
 
 
 
-contract BrightCoinERC20 is TokenPreSaleDetails,TokenMainSaleDetails, BrightCoinTokenDistributionDetails
+contract BrightCoinERC20 is TokenPreSaleDetails,
+                            TokenMainSaleDetails, 
+                            BrightCoinAdminTokenDistributionDetails,
+                            BrightCoinInvestorTokenLock
+                          
+                         
+                            
 {
   using SafeMath for uint;
 
@@ -24,24 +31,27 @@ contract BrightCoinERC20 is TokenPreSaleDetails,TokenMainSaleDetails, BrightCoin
   event Mint(address target, uint256 mintedAmount);
   
  //Token Details  
-  string public constant Tokensymbol = "ABC"; // This is token symbol
-  string public constant TokenName = "TokenName"; // this is token name
+  string public constant symbol = "XBR"; // This is token symbol
+  string public constant name = "BrightCOIN"; // this is token name
   uint256 public constant decimals = 18; // decimal digit for token price calculation
   string public constant version = "1.0";
-  uint8 public constant ICOType = 0;   //0 for RegD , 1 for RegS and 2 for RedDRegS and 3 means utility ICO
-  bool  internal isICOActive = true; 
+  uint8 public constant ICOType = 2;   //0 for RegD , 1 for RegS and 2 for RedDRegS and 3 means utility ICO
+  bool  internal pauseICO = false; 
   
   enum BrightCoinICOType { RegD, RegS, RegDRegS, Utility }
 
 //Token Supply Details
-  uint256 public constant initialSupply = 100000;
+  uint256 public constant initialSupply = 30000;
   uint256 public totalSupply; //Need to set at constructor level
   uint256 private  BountyDistriuted = 0;
   
+  //Presale Maximum and Minmum Contributions
+    uint256  internal MinimumContribution = 0.05 ether;
+    uint256  internal MaximumContribution = 0.3 ether;
 
   //Purchase Rate
   //purchase rate can be changed by the Owner
-  uint256 public purchaseRate = 1000;
+  uint256 public purchaseRate = 5000;  //5000 token per Ether
   function setPurchaseRate(uint newRate) public onlyTokenOwner {
         require(purchaseRate != newRate);
         purchaseRate = newRate;
@@ -51,40 +61,41 @@ contract BrightCoinERC20 is TokenPreSaleDetails,TokenMainSaleDetails, BrightCoin
  /*
     Soft cap is the minimal amount required by your project, to make it viable, in order to continue. If you do not reach that amount during your ICO then you should allow your investors to refund their money using a push/ pull mechanism.
  */
-  uint internal ICOSoftCap = 1000000; //Minimum Eather to Reach
-  uint internal ICOHardCap = 20000;
+  uint internal ICOSoftlimit = 5000; //Minimum Eather to Reach
+  uint internal ICOHardlimit = 30000;
 
 
-  function ChangeSoftCap(uint newSoftCap) public onlyTokenOwner {
-        require(ICOSoftCap != newSoftCap);
-        require(newSoftCap < totalSupply);
-        ICOSoftCap = newSoftCap;
+  function ChangeSoftCap(uint newSoflimit) public onlyTokenOwner {
+        require(ICOSoftlimit != newSoflimit);
+        require(newSoflimit < totalSupply);
+        ICOSoftlimit = newSoflimit;
       
     }
-    function ChangeHardCap(uint newHardCap) public onlyTokenOwner {
-        require(ICOHardCap != newHardCap);
-        require(newHardCap < totalSupply);
-        ICOHardCap = newHardCap;
+    function ChangeHardLimtit(uint256 newHardlimit) public onlyTokenOwner {
+       
+        require(ICOHardlimit != newHardlimit);
+        require(newHardlimit < totalSupply);
+        ICOHardlimit = newHardlimit;
       
     }
 
-    function GetSoftCap() onlyTokenOwner view public  returns(uint256) {
+    function GetSoftLimit() onlyTokenOwner view public  returns(uint256) {
 
-      return ICOSoftCap;
+      return ICOSoftlimit;
     }
 
-     function GetHardCap()  onlyTokenOwner view public returns(uint256) {
+     function GetHardLimit()  onlyTokenOwner view public returns(uint256) {
 
-      return ICOHardCap;
+      return ICOHardlimit;
     }
 
     //Check if softcap reached
-    function CheckIfSoftCapReached() onlyTokenOwner   internal  view returns(bool)
+    function CheckIfSoftlimitReached() onlyTokenOwner   internal  view returns(bool)
     {
 
       uint tokenSold = totalSupply.sub(balances[owner()]);
 
-        if(tokenSold > ICOSoftCap)
+        if(tokenSold > ICOSoftlimit)
           return true;
           else 
           return false;  
@@ -92,12 +103,11 @@ contract BrightCoinERC20 is TokenPreSaleDetails,TokenMainSaleDetails, BrightCoin
     }
 
     //check if HARD Cap Achived
-    function CheckIfHardcapAchived(uint256 tokens)  internal view returns(bool)
+    function CheckIfHardlimitAchived(uint256 tokens)  internal view returns(bool)
     {
-   
       uint tokenSold = totalSupply.sub(balances[owner()]);
-      require(tokenSold <= ICOHardCap);
-      require(tokenSold.add(tokens) <=ICOHardCap);
+      require(tokenSold <= ICOHardlimit);
+      require(tokenSold.add(tokens) <=ICOHardlimit);
       return true;
 
     }
@@ -105,7 +115,7 @@ contract BrightCoinERC20 is TokenPreSaleDetails,TokenMainSaleDetails, BrightCoin
     
   
   //Investment storage address
-  address public FundDepositAddress = 0x9750aa30a3281df657d8b08499e1b5dbc90e0b5f; //Should be taken from Script 
+  address public FundDepositAddress = 0x347a4442d3325a06b46c8860e168df440c2ad881; //Should be taken from Script 
   function ChangeFundDepositAddress(address NewFundDepositAddress) onlyTokenOwner public {
     require( FundDepositAddress != NewFundDepositAddress );
     FundDepositAddress = NewFundDepositAddress;
@@ -135,11 +145,12 @@ function UpdateTokenMintingOption(bool mintingOption) onlyTokenOwner public {
    TotalAllocatedTeamToken = InitialAllocatedTeamToken*(10**uint256(decimals));
    TotalAllocatedFounder = InitialFounderToken*(10**uint256(decimals));
    TotalAllocatedAdvisorToken = InitialAllocatedAdvisorToken*(10**uint256(decimals));
-   RewardsBountyToken = InitialRewardsBountyToken*(10**uint256(decimals));
    CompanyHoldingValue = InitialCompanyHoldingValue*(10**uint256(decimals));
+    BountyAllocated = totalBountyAllocated*(10**uint256(decimals));
    
 
-   ICOHardCap = ICOHardCap*(10**uint256(decimals));
+   ICOHardlimit = ICOHardlimit.mul(10**uint256(decimals));
+   ICOSoftlimit = ICOSoftlimit.mul(10**uint256(decimals));
    balances[msg.sender] = totalSupply;
    BountyDistriuted = 0;
  
@@ -240,51 +251,12 @@ function totalSupply() public constant returns (uint256) {
 
 
    //Owner of ICO can anytime Stop the ICO post that no any transaction will happen
-   function StopICO(bool _status) onlyTokenOwner public {
+   function pauseICOtransaction(bool _status) onlyTokenOwner public {
 
-    isICOActive = _status;
+    pauseICO = _status;
    }
 
-
-//ReleaseToken to Founder 
-   function ReleaseTokenToFounder(address founderAddress, uint256 currentDateTime)  onlyTokenOwner public returns(uint256)
-   {
-      FounderDistribution storage FounderDetails = FounderTokenDetails[founderAddress];
-
-      //check if eligible for token
-      require(currentDateTime > FounderDetails.LockExpiryTime);
-      return FounderDetails.FounderToken;
-   }
  
-   
-
-   //ReleaseToken to Advisor
-   function ReleaseTokenToAdvisor(address AdvisorAddress, uint256 currentDateTime)  onlyTokenOwner public returns(uint256)
-   {
-     AdvisorDistribution storage AdvisorDetails = AdvisorDistributionDetails[AdvisorAddress];
-    //check if eligible for token
-      require(currentDateTime > AdvisorDetails.AdvisorDistributionAmountLockExpiryTime);
-     return AdvisorDetails.AdvisorDistributionAmount;
-   }
-   
-
-    //ReleaseToken to Team
-   function ReleaseTokenToTeam(address TeamAddress, uint256 currentDateTime)  onlyTokenOwner public returns(uint256)
-   {
-      TeamDistribution storage TeamDetails = TeamDistributionDetails[TeamAddress];
-     //check if eligible for token
-      require(currentDateTime > TeamDetails.TeamDistributionAmountLockExpiryDateTime);
-      return TeamDetails.TeamDistributionAmount;
-   }
-  
-   
-
-
-  function ReleaseCompanyHoldingTokens(uint256 currentdatetime)  onlyTokenOwner public returns(uint256)
-  { 
-    require(currentdatetime > CompanyHoldinglockingPeriod);
-    return CompanyHoldingValue; 
-}
    
   
 

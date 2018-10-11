@@ -71,7 +71,8 @@ contract BrightCoinTokenOwner
    * @dev Allows the current owner to transfer control of the contract to a newOwner.
    * @param newOwner The address to transfer ownership to.
    */
-  function transferOwnership(address newOwner) public onlyTokenOwner {
+  function transferOwnership(address newOwner) public onlyTokenOwner
+   {
     _transferOwnership(newOwner);
   }
 
@@ -84,4 +85,5 @@ contract BrightCoinTokenOwner
     _owner = newOwner;
     emit OwnershipTransferred(_owner, newOwner);
   }
+
 }

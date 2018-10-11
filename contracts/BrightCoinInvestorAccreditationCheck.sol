@@ -40,12 +40,12 @@ How much has this investor invested in the past.
 pragma solidity ^0.4.24;
 
 import "./BrightCoinTokenOwner.sol";
-import "./BrightCoinNonAccridetednvestor.sol";
+import "./BrightCoinnonAccridetedInvestor.sol";
 import "./BrightCoinAccreditionInvestor.sol";
 
 
 
-contract BrightCoinInvestorAccreditationCheck is BrightCoinAccreditionInvestor,BrightCoinNonAccridetednvestor
+contract BrightCoinInvestorAccreditationCheck is BrightCoinAccreditionInvestor,BrightCoinnonAccridetedInvestor
 {
 
 enum BrightCoinICOType { RegD, RegS, RegDRegS, Utility }
@@ -216,93 +216,6 @@ function checkInvestorValidity( address InvestorAddress, uint256 currentdatetime
 
  }
 
-
- function SetLockingPeriodAndToken(address InvestorAddress, uint256 expiryDateTime, 
-                                      uint256 tokenamount, uint8 ICOType) public
- {
-
- bool validityStatus = false;
-  if(ICOType == uint8(BrightCoinICOType.RegD))
-    {
-      SetLockingPeriodAccreditedInvestor(InvestorAddress,expiryDateTime,tokenamount);
-    }
-    else if (ICOType == uint8(BrightCoinICOType.RegS))
-    {
-        //Check Accridition Status
-         validityStatus = CheckAccreditionStatus(InvestorAddress,now);
-        if(validityStatus == true)
-          SetLockingPeriodAccreditedInvestor(InvestorAddress,expiryDateTime,tokenamount);
-        else
-        SetLockingPeriodRegS(InvestorAddress,expiryDateTime,tokenamount);
-        
-    }
-    else if(ICOType == uint8(BrightCoinICOType.RegDRegS))
-    {
-        //Do check for RegDand RegS stuff
-         validityStatus = CheckAccreditionStatus(InvestorAddress,now);
-        if(validityStatus == false)
-        {
-            //It must be RegS Investor
-         SetLockingPeriodRegS(InvestorAddress,expiryDateTime,tokenamount);
-        }
-        else
-        SetLockingPeriodAccreditedInvestor(InvestorAddress,expiryDateTime,tokenamount);
-
-    }
-    else  //Utility ICO 
-    {
-       //Mo Locking period but do we need to store their amount transaction details
-    }
-
- }
-
-  function GetTokenLockExpiryDateTime(address senderAddr,uint8 ICOType ) public view returns(uint256)
-  {
-      uint256 lockingexpiryDate;
-      bool validityStatus = false;
-
-     if(ICOType == uint8(BrightCoinICOType.RegD))
-    {
-      lockingexpiryDate = GetTokenLockExpiryDateTimeAccreditedInvestor(senderAddr);
-      return lockingexpiryDate;
-    }
-    else if(ICOType == uint8(BrightCoinICOType.RegDRegS))
-    {
-
-        //Do check for RegDand RegS stuff
-        validityStatus = CheckAccreditionStatus(senderAddr,now);
-        if(validityStatus == false)
-        {
-            lockingexpiryDate = GetTokenLockExpiryDateTimeRegS(senderAddr);  //RegS Investor
-            return lockingexpiryDate;
-        }
-        else
-        {
-            lockingexpiryDate = GetTokenLockExpiryDateTimeAccreditedInvestor(senderAddr);  //Accriderted Investor
-             return lockingexpiryDate;
-        }
-
-    }
-   else if(ICOType == uint8(BrightCoinICOType.RegS))
-    {
-
-         validityStatus = CheckAccreditionStatus(senderAddr,now);
-        if(validityStatus == true)
-          lockingexpiryDate = GetTokenLockExpiryDateTimeAccreditedInvestor(senderAddr);
-        else
-        lockingexpiryDate = GetTokenLockExpiryDateTimeRegS(senderAddr);  //RegS Investor
-
-        return lockingexpiryDate;
-
-    }
-    else
-    {
-        //Utility no expirydate
-    }
-
-    return 0;
-
-   }
 
   
 }

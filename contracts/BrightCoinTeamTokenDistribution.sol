@@ -14,17 +14,17 @@ constructor() public
 
 //Team Distribution  
  //There might be multiple entry to this
- uint256 public constant InitialAllocatedTeamToken = 100000;  // Token token allocated for Team distribution
+ uint256 public constant InitialAllocatedTeamToken = 2000;  // Token token allocated for Team distribution
  uint256 public TotalAllocatedTeamToken;
  uint256 internal currentAllocatedTeamToken = 0;  //To be added as it is 
  
  struct TeamDistribution {
-        address TeamDistributionAddress;
-        uint256 TeamDistributionAmount;
-        uint256 TeamDistributionAmountLockStatrDateTime;
-        uint256 TeamDistributionAmountLockExpiryDateTime;
-        bool    TeamActiveInvestor;  //To Ensure if team is still on
-        bool    TeamDistributionIndex; //just to ensure this team once got the investment   
+        address addr;
+        uint256 tokenamount;
+        uint256 lockexpiry;
+        bool   TeamActiveInvestor;  //To Ensure if team is still on
+        bool tokenlocked;
+    
     }
 
  mapping(address => TeamDistribution) TeamDistributionDetails;
@@ -34,30 +34,29 @@ constructor() public
  //Team Token Distribution  Starts
 
 //Addng Details to Team Token
- function AddTeamInvestor(address NewTeamAddr,uint256 Tokenamount,uint256 TokenLockStartDateTime,uint256 TokenLockEndDateTime, bool partofTeam) onlyTokenOwner  public {
+ function AddTeam(address NewTeamAddr,uint256 Tokenamount,
+ uint256 lockexpirydate,
+ bool tokenLocked) onlyTokenOwner  public {
      
   require(IsTokenAvailable(Tokenamount) == true);
   TeamDistribution storage TeamDetails = TeamDistributionDetails[NewTeamAddr];
- // require(TeamDetails.partOfTeam == true);
-
-  if(TeamDetails.TeamDistributionIndex == false) //New Team
-  {
-    TeamDetails.TeamDistributionAddress = NewTeamAddr;
-    TeamDetails.TeamDistributionAmount = Tokenamount;
-    TeamDetails.TeamDistributionAmountLockStatrDateTime = TokenLockStartDateTime;
-    TeamDetails.TeamDistributionAmountLockExpiryDateTime = TokenLockEndDateTime;
-    TeamDetails.TeamActiveInvestor = partofTeam;
-    TeamDetails.TeamDistributionIndex = true;
+    TeamDetails.addr = NewTeamAddr;
+    TeamDetails.tokenamount = Tokenamount;
+    TeamDetails.lockexpiry = lockexpirydate;
+    TeamDetails.TeamActiveInvestor = true;
+    TeamDetails.tokenlocked = tokenLocked;
     TeamTokenDetailsAddr.push(NewTeamAddr);
-  }
-  else
-  {
-      //check if Team is Active
-      require(CheckIfTeamActive(NewTeamAddr) == true);
-      TeamDetails.TeamDistributionAmount += Tokenamount;
-      TeamDetails.TeamDistributionAmountLockStatrDateTime = TokenLockStartDateTime;
-      TeamDetails.TeamDistributionAmountLockExpiryDateTime = TokenLockEndDateTime;
-  }
+
+ }
+
+ function UpdateTeamTokenDetails(address teamaddr,uint256 Tokenamount,uint256 LockExpiryDateTime)
+ {
+       //check if Team is Active
+      require(CheckIfTeamActive(teamaddr) == true);
+     TeamDistribution storage TeamDetails = TeamDistributionDetails[teamaddr];
+ 
+      TeamDetails.tokenamount += Tokenamount;
+      TeamDetails.lockexpiry = LockExpiryDateTime;
   
  }
 
@@ -103,23 +102,8 @@ constructor() public
  {
 
   TeamDistribution storage TeamDetails = TeamDistributionDetails[NewTeamAddr];
-  //require(TeamDetails.TeamDistributionIndex == true);
-        return TeamDetails.TeamDistributionAmount;
+        return TeamDetails.tokenamount;
 
  }
-
-/*function GetTeamToken(address NewTeamAddr, uint256 currentdatetime)   internal  returns(uint256)
-{
-
-TeamDistribution storage TeamDetails = TeamDistributionDetails[NewTeamAddr];
-
-  //check if eligible for token
-  require(currentdatetime > TeamDetails.TeamDistributionAmountLockExpiryDateTime);
-
-   return TeamDetails.TeamDistributionAmount;
-}
-*/
-
-
 
 }

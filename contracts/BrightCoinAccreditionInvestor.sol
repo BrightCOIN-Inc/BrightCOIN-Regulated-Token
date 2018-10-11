@@ -14,7 +14,7 @@ contract  BrightCoinAccreditionInvestor is BrightCoinTokenOwner
 {
 
 using SafeMath for uint;
-uint256 public  TotalInvestmentCurrently;
+uint256 public  TotalInvestmentCurrently; 
 uint256 public constant USAGeoLocation = 1;
 
 
@@ -28,8 +28,6 @@ struct AccreditedInvestor
     address Investor;
     bool    AccreditionStatus;
     uint256 AccreditionExpiryDateTime;
-    uint256 lockInEndDate;
-    uint256 TokenPurchased;
     uint256 InvestorGeoLocation;  //Must be USA Citizen Only in Case of RegDRegS Investment
     string ipfsHashRegDInvestor; //It must contains the details of Investor
        
@@ -52,8 +50,6 @@ struct AccreditedInvestor
        Investment.AccreditionExpiryDateTime = AccreditionExpiryDateTime;
        Investment.InvestorGeoLocation = InvestorGeoLocation;
        Investment.ipfsHashRegDInvestor = ipfsHashRegDInvestor;
-       Investment.lockInEndDate = 0;
-       Investment.TokenPurchased = 0;
 
        accreditedInvestors.push(Investoraddr);
 }
@@ -88,6 +84,7 @@ function SetAccreditionStatus(address investorAddress, bool status) onlyTokenOwn
       structAccredited.AccreditionExpiryDateTime = expiryDateTime;
   }
 
+/*
  function SetLockingPeriodAccreditedInvestor(address structAccreditedInvestoraddr, uint256 expiryDateTime, uint256 tokenamount)  internal {
 
   require(expiryDateTime > 0);
@@ -100,8 +97,9 @@ function SetAccreditionStatus(address investorAddress, bool status) onlyTokenOwn
   
 
  }
+ */
 
- function GetTokenLockExpiryDateTimeAccreditedInvestor(address structAccreditedInvestoraddr) view  internal  returns(uint256) {
+ /*function GetTokenLockExpiryDateTimeAccreditedInvestor(address structAccreditedInvestoraddr) view  internal  returns(uint256) {
 
  if(structAccreditedInvestoraddr != 0x0)
  {
@@ -111,6 +109,7 @@ function SetAccreditionStatus(address investorAddress, bool status) onlyTokenOwn
  return 0;
  
  }
+ */
 
 
  }

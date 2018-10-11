@@ -5,7 +5,7 @@ import "./BrightCoinTokenOwner.sol";
 contract BrightCoinInvestorKYC is BrightCoinTokenOwner
 {
 
-uint256 public constant Maximumcontributors = 100000; //Maximum no of Contributors
+
 
 
 constructor() public
@@ -27,15 +27,12 @@ address[] public BrightCoinInvestorKYCAddr;
 function SetKYCDetailsofInvestor(address InvestordAddress,bool KYCStatus,
                                 uint256 KYCExpiryDateTime, string ipfsHashKYC) onlyTokenOwner public 
  {
-         
-      require( BrightCoinInvestorKYCAddr.length <= Maximumcontributors);
 
        BrightCoinInvestorKYCstruct storage InvestorKYC = BrightCoinInvestorKYCDetails[InvestordAddress];
        InvestorKYC.whitelistedAddress = InvestordAddress;
        InvestorKYC.KYCStatus = KYCStatus;
        InvestorKYC.KYCExpiryDateTime = KYCExpiryDateTime;
        InvestorKYC.ipfsHashKYC = ipfsHashKYC;
- 
        BrightCoinInvestorKYCAddr.push(InvestordAddress);
    }
 
@@ -76,6 +73,7 @@ function SetKYCExpiryDateTime(address InvestordAddress,uint256 expiryDateTime)  
     BrightCoinInvestorKYCstruct storage InvestorKYC = BrightCoinInvestorKYCDetails[InvestordAddress];
     InvestorKYC.KYCExpiryDateTime = expiryDateTime;
 
+}
 function GetKYCExpiryDate(address InvestordAddress)  public view returns(uint256)
 {
     
