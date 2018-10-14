@@ -22,8 +22,8 @@ contract TokenPreSaleDetails is BrightCoinTokenOwner
 
 
     //PreSale Start & End Dates 
-    uint256 internal ICOstartDate = 1536061800;    
-    uint256 internal ICOendDate = 1566102022;     //22/12/2018
+    uint256 internal ICOstartDate = 1539235557; //11/10/2018 10:55
+    uint256 internal ICOendDate = 1540037894;     //20/10/2018 6PM
 
     //Current Presale Status 
     bool public PreSaleOn = true;
@@ -37,7 +37,7 @@ contract TokenPreSaleDetails is BrightCoinTokenOwner
     return true;
   }
 
-    function getMaxCoinSoldDuringPreSale(uint256 decimal) internal returns(uint256)
+    function getMaxCoinSoldDuringPreSale(uint256 decimal) pure internal  returns(uint256)
     {
         uint256 val = maxCoinSoldDuringPresale*(10**uint256(decimal));
         return val;
@@ -227,7 +227,7 @@ function AddMainSalePeriod(uint256 mainStartDate,uint256 mainSaleEndDate,uint256
    * @dev it changes the limit of max token that can be sold in this period
    * @param currenttime check current time for mainSale
    */
-  function checkMainSalePeriod( uint256 currenttime)  internal returns(uint8)
+  function checkMainSalePeriod( uint256 currenttime) view internal returns(uint8)
   {
 
   if(mainSaleToken.length  == 0)
@@ -242,9 +242,13 @@ function AddMainSalePeriod(uint256 mainStartDate,uint256 mainSaleEndDate,uint256
   {
        return MainSaleTokenSale.periodIndex;
   }
+ 
   return 0;
 
   }
+  
+  
+  return 0;
 
   }
 

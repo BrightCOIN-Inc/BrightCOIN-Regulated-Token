@@ -57,7 +57,7 @@ constructor() public
 }
 
 
- function checkBothInvestorValidity(address investor, address InvestorAddress, uint256 currentdatetime, uint8 ICOType)  public view returns(bool)
+ function checkBothInvestorValidity(address investor, address InvestorAddress, uint8 ICOType)  public view returns(bool)
  {
 
    bool validityStatus = false;
@@ -66,8 +66,8 @@ constructor() public
  
     if(ICOType == uint8(BrightCoinICOType.RegD))
     {
-      Investoevalidity = CheckAccreditionStatus(investor,currentdatetime);
-      newInvestorvalidity = CheckAccreditionStatus(InvestorAddress,currentdatetime);
+      Investoevalidity = CheckAccreditionStatus(investor);
+      newInvestorvalidity = CheckAccreditionStatus(InvestorAddress);
        if( Investoevalidity == newInvestorvalidity)
             return true;
     }
@@ -78,18 +78,18 @@ constructor() public
         uint256 geoLocation2;
   
         //check Accridition Status of Both the Investor as
-          Investoevalidity = CheckAccreditionStatus(investor,currentdatetime);
+          Investoevalidity = CheckAccreditionStatus(investor);
           if(Investoevalidity == true) 
                geoLocation1 = GetGeoLocationAccreditedInvestor(investor);
            else
-           geoLocation1 = GetGeoLocationOfInvestor(investor);
+           geoLocation1 = GetGeoLocationOfNonInvestor(investor);
 
            //check of other Investor
-           Investoevalidity = CheckAccreditionStatus(InvestorAddress,currentdatetime);
+           Investoevalidity = CheckAccreditionStatus(InvestorAddress);
           if(Investoevalidity == true) 
                geoLocation2 = GetGeoLocationAccreditedInvestor(InvestorAddress);
            else
-           geoLocation2 = GetGeoLocationOfInvestor(InvestorAddress);
+           geoLocation2 = GetGeoLocationOfNonInvestor(InvestorAddress);
 
            if( geoLocation1 !=1 && geoLocation2 != 1 )  //Make sure GeoLocation ius not USA
               validityStatus =  true;   
@@ -104,10 +104,10 @@ constructor() public
         bool validityStatus2 = false;
         uint256 geolocation;
         
-        Investoevalidity = CheckAccreditionStatus(investor,currentdatetime);
+        Investoevalidity = CheckAccreditionStatus(investor);
           if(Investoevalidity == false) 
           {
-               geolocation = GetGeoLocationOfInvestor(investor);
+               geolocation = GetGeoLocationOfNonInvestor(investor);
                if(geolocation != 1)
                  validityStatus1 =  true; 
           }
@@ -116,10 +116,10 @@ constructor() public
              validityStatus1 =  true; 
           }
 
-          bool Investorevalidity2 = CheckAccreditionStatus(InvestorAddress,currentdatetime);
+          bool Investorevalidity2 = CheckAccreditionStatus(InvestorAddress);
           if(Investorevalidity2 == false) 
           {
-               geolocation = GetGeoLocationOfInvestor(InvestorAddress);
+               geolocation = GetGeoLocationOfNonInvestor(InvestorAddress);
                if( geolocation != 1)
                  validityStatus2 =  true; 
           }
@@ -138,8 +138,8 @@ constructor() public
     {
 
 
-         geoLocation1 = GetGeoLocationOfInvestor(InvestorAddress);
-         geoLocation2 = GetGeoLocationOfInvestor(investor);
+         geoLocation1 = GetGeoLocationOfNonInvestor(InvestorAddress);
+         geoLocation2 = GetGeoLocationOfNonInvestor(investor);
 
         if((geoLocation1 != 1) && (geoLocation2 != 1))
               return true;
@@ -153,7 +153,7 @@ constructor() public
  }
 
 
-function checkInvestorValidity( address InvestorAddress, uint256 currentdatetime, uint8 ICOType)  public view returns(bool)
+function checkInvestorValidity( address InvestorAddress, uint8 ICOType)  public view returns(bool)
  {
 
     bool validityStatus = false;
@@ -161,14 +161,14 @@ function checkInvestorValidity( address InvestorAddress, uint256 currentdatetime
  
     if(ICOType == uint8(BrightCoinICOType.RegD))
     {
-      validityStatus = CheckAccreditionStatus(InvestorAddress,currentdatetime);
+      validityStatus = CheckAccreditionStatus(InvestorAddress);
        return validityStatus;
     }
     else if (ICOType == uint8(BrightCoinICOType.RegS))
     {
    
       //check if Investor is Accrideted One
-      bool AccreditionStatus  = CheckAccreditionStatus(InvestorAddress,currentdatetime);
+      bool AccreditionStatus  = CheckAccreditionStatus(InvestorAddress);
       if(AccreditionStatus == true)
       {
           // now check GeoLocatiom
@@ -179,7 +179,7 @@ function checkInvestorValidity( address InvestorAddress, uint256 currentdatetime
           return validityStatus;
       }    
 
-      GeoLocation = GetGeoLocationOfInvestor(InvestorAddress);
+      GeoLocation = GetGeoLocationOfNonInvestor(InvestorAddress);
       if(GeoLocation != 1) //Should not be USA
       validityStatus = true;
       return validityStatus;
@@ -188,11 +188,12 @@ function checkInvestorValidity( address InvestorAddress, uint256 currentdatetime
     else if(ICOType == uint8(BrightCoinICOType.RegDRegS))
     {
         //Do check for RegD and RegS stuff
-        validityStatus = CheckAccreditionStatus(InvestorAddress,currentdatetime);
+        validityStatus = CheckAccreditionStatus(InvestorAddress);
         if(validityStatus == false)
         {            
            
-           GeoLocation = GetGeoLocationOfInvestor(InvestorAddress);
+           GeoLocation = GetGeoLocationOfNonInvestor(InvestorAddress);
+           require(GeoLocation !=0, "Geolocation Should not be zero");
            if(GeoLocation != 1) //Should not be USA  
                validityStatus = true;
          
@@ -203,7 +204,7 @@ function checkInvestorValidity( address InvestorAddress, uint256 currentdatetime
     }
     else  //Utility ICO 
     {
-        GeoLocation = GetGeoLocationOfInvestor(InvestorAddress);
+        GeoLocation = GetGeoLocationOfNonInvestor(InvestorAddress);
         if(GeoLocation != 1)
            validityStatus = true;
 

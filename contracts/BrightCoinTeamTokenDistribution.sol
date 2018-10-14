@@ -7,6 +7,7 @@ contract BrightCoinTeamTokenDistribution  is BrightCoinTokenOwner
 {
 
 
+  mapping(address => uint256)TeamBalances;
 constructor() public
 {
  
@@ -16,7 +17,7 @@ constructor() public
  //There might be multiple entry to this
  uint256 public constant InitialAllocatedTeamToken = 2000;  // Token token allocated for Team distribution
  uint256 public TotalAllocatedTeamToken;
- uint256 internal currentAllocatedTeamToken = 0;  //To be added as it is 
+ 
  
  struct TeamDistribution {
         address addr;
@@ -38,7 +39,6 @@ constructor() public
  uint256 lockexpirydate,
  bool tokenLocked) onlyTokenOwner  public {
      
-  require(IsTokenAvailable(Tokenamount) == true);
   TeamDistribution storage TeamDetails = TeamDistributionDetails[NewTeamAddr];
     TeamDetails.addr = NewTeamAddr;
     TeamDetails.tokenamount = Tokenamount;
@@ -49,11 +49,13 @@ constructor() public
 
  }
 
- function UpdateTeamTokenDetails(address teamaddr,uint256 Tokenamount,uint256 LockExpiryDateTime)
+ function UpdateTeamTokenDetails(address teamaddr,
+                            uint256 Tokenamount,
+                            uint256 LockExpiryDateTime) internal
  {
        //check if Team is Active
-      require(CheckIfTeamActive(teamaddr) == true);
-     TeamDistribution storage TeamDetails = TeamDistributionDetails[teamaddr];
+       require(CheckIfTeamActive(teamaddr) == true);
+      TeamDistribution storage TeamDetails = TeamDistributionDetails[teamaddr];
  
       TeamDetails.tokenamount += Tokenamount;
       TeamDetails.lockexpiry = LockExpiryDateTime;
@@ -67,15 +69,7 @@ constructor() public
 
  }
 
-//ENDS
- 
- function IsTokenAvailable(uint256 Tokenamount) public returns(bool)
- {
-     require(currentAllocatedTeamToken <=TotalAllocatedTeamToken);
-     require(currentAllocatedTeamToken + Tokenamount < TotalAllocatedTeamToken);
-     currentAllocatedTeamToken += Tokenamount;
-     return true;
- }
+
 
  function TotalTeamnvestor() public view returns(uint256) 
  {
@@ -84,7 +78,7 @@ constructor() public
  }
 
 //check if Team Removed 
- function CheckIfTeamActive(address TeamAddr) view public returns(bool)
+ function CheckIfTeamActive(address TeamAddr) view internal returns(bool)
  {
 
   TeamDistribution storage TeamDetails = TeamDistributionDetails[TeamAddr];

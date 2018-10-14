@@ -6,14 +6,8 @@ import "./BrightCoinTokenOwner.sol";
 contract BrightCoinFounderTokenDistribution  is BrightCoinTokenOwner
 {
 
-
+  mapping(address => uint256)FounderBalances;
 using SafeMath for uint;
-
-//There might be multiple entry to this
-uint256 public constant InitialFounderToken = 20000;
-uint256 public TotalAllocatedFounder = 0;
-uint256 public CurrentAllocatedFounderToken = 0; //To be taken as it is 
-
 
  struct FounderDistribution {
        address FounderAddress;
@@ -37,13 +31,13 @@ function AddFounder(address newFounder,uint256 FounderToken,uint256 LockExpiryDa
  bool tokenLocked)   internal 
   {
 
-      //require(TokenAvailableForFounder(FounderToken) == true);
       FounderDistribution storage  FounderDetails = FounderTokenDetails[newFounder];
     
       FounderDetails.FounderAddress = newFounder;
       FounderDetails.FounderToken = FounderToken;
       FounderDetails.LockExpiryTime = LockExpiryDateTime;
       FounderDetails.Tokenlocked = tokenLocked;
+      FounderDetails.FounderActive = true;
       FounderAddrs.push(newFounder);
     
  }
@@ -53,7 +47,6 @@ function AddFounder(address newFounder,uint256 FounderToken,uint256 LockExpiryDa
   uint256 LockExpiryDateTime) internal
   {
     require(CheckIfFounderActive(newFounder) == true);   
-   // require(TokenAvailableForFounder(FounderToken) == true);             
      //Add new Token amount and Set new locking Period
       FounderDistribution storage  FounderDetails = FounderTokenDetails[newFounder];
      FounderDetails.FounderToken  = FounderDetails.FounderToken.add(FounderToken);
@@ -109,3 +102,4 @@ function AddFounder(address newFounder,uint256 FounderToken,uint256 LockExpiryDa
 
 
  
+    

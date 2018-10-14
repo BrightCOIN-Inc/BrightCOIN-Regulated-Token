@@ -12,7 +12,11 @@ contract BrightCoinAdminTokenDistributionDetails is BrightCoinAdvisorTokenDistri
 
 using SafeMath for uint;
 
-enum BrightCoinAdminType { Founder, Advisor, Team }
+
+  mapping(address => uint256)CompanyHoldingBalances;
+  mapping(address => uint256)BountyBalances;
+
+enum BrightCoinAdminType { Founder, Advisor, Team, CompanyHolding, Bounty }
 
 constructor() public
 {
@@ -23,9 +27,13 @@ constructor() public
   //Token distribution details
   /////////////////////////////////////////
   //Token Distribution Details --- Founder 
+uint256 public constant InitialFounderToken = 20000;
+uint256 public TotalAllocatedFounder = 0;
+uint256 public CurrentAllocatedFounderToken = 0; //To be taken as it is 
+
 
  //Company Holdings
- address public constant CompanyHoldingAddress = 0xfedf9e65af88f215738e74114cb2c2218076;//To be updated via Script
+ address public constant CompanyHoldingAddress = 0x4c04c94444df14d7843eeb8b64a7dba62eab7a3e;//To be updated via Script
  uint256 public constant InitialCompanyHoldingValue = 40000;// Value to be updated via Script
  uint256 public CompanyHoldingValue = 0;
 
@@ -34,7 +42,7 @@ constructor() public
 //Bounty Token Distribution
 uint256 public constant totalBountyAllocated = 3000;
 uint256 public BountyAllocated = 0;
-address public  constant BountyTokenHolder = 0x826bbe56a1a5b3b83346530a6d1791b1bc8b0c5e; //This address own the token and finally transfer
+address public  constant BountyTokenHolder = 0x403f4fedf6127f30e77ae8295dea47eea0832899; //This address own the token and finally transfer
   modifier onlyBountyTokenOwner() {
         require(msg.sender == BountyTokenHolder, " Bounty Owner Not Authorized");
         _;
@@ -84,41 +92,7 @@ function UpdateAdminTokenDetails(address addr, uint256 expiryDateTime,
 
  }
 
- //Check if token is available for further Distribution to Admin
- function TokenAvailableForAdmin(address addr,
-                     uint256 currentBalance,
-                     uint256 TokenAmount,
-                     uint8 AdminType )  internal  returns(bool)
- {
-     if(AdminType == uint8(BrightCoinAdminType.Founder))
-    {
-      require(currentBalance <=TotalAllocatedFounder);
-      require(currentBalance.add(TokenAmount) <= TotalAllocatedFounder);
-      return true;
-    }
-    else if (AdminType == uint8(BrightCoinAdminType.Advisor))
-    {
-      require(currentBalance <= TotalAllocatedAdvisorToken);
-      require(currentBalance.add(TokenAmount) <= TotalAllocatedAdvisorToken);
-      return true;
-    }
-    else if(AdminType == uint8(BrightCoinAdminType.Team))
-    {
-      require(currentBalance <=TotalAllocatedTeamToken);
-      require(currentBalance.add(TokenAmount) <= TotalAllocatedTeamToken);
-      return true;
-
-    }  
- }
-
-//Check if token is available for further Distribution to Advisor
- function TokenAvailableForBounty(uint256 TokenBalance, uint256 Tokenamount) internal returns(bool)
- {
-     require(TokenBalance <= BountyAllocated);
-     require(TokenBalance.add(Tokenamount) <= BountyAllocated);
-     return true;
- }  
-
  
+
  
 }

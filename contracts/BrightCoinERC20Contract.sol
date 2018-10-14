@@ -10,10 +10,12 @@ import "./BrightCoinInvestorTokenLock.sol";
 
 
 
+
 contract BrightCoinERC20 is TokenPreSaleDetails,
-                            TokenMainSaleDetails, 
-                            BrightCoinAdminTokenDistributionDetails,
+                            TokenMainSaleDetails,
+                           BrightCoinAdminTokenDistributionDetails,
                             BrightCoinInvestorTokenLock
+                           
                           
                          
                             
@@ -115,7 +117,7 @@ contract BrightCoinERC20 is TokenPreSaleDetails,
     
   
   //Investment storage address
-  address public FundDepositAddress = 0x347a4442d3325a06b46c8860e168df440c2ad881; //Should be taken from Script 
+  address public FundDepositAddress = 0x715f24e3e143cb839E8A6b167EF0A5934CCB61d6; //Should be taken from Script 
   function ChangeFundDepositAddress(address NewFundDepositAddress) onlyTokenOwner public {
     require( FundDepositAddress != NewFundDepositAddress );
     FundDepositAddress = NewFundDepositAddress;
@@ -135,6 +137,7 @@ function UpdateTokenMintingOption(bool mintingOption) onlyTokenOwner public {
  
  ////////////////////////////////////////
   mapping(address => uint256) balances;
+
  //////////////////////////////////////////
   
  
@@ -142,16 +145,25 @@ function UpdateTokenMintingOption(bool mintingOption) onlyTokenOwner public {
 
    totalSupply = initialSupply*(10**uint256(decimals));
 
-   TotalAllocatedTeamToken = InitialAllocatedTeamToken*(10**uint256(decimals));
-   TotalAllocatedFounder = InitialFounderToken*(10**uint256(decimals));
+  TotalAllocatedTeamToken = InitialAllocatedTeamToken*(10**uint256(decimals));
+ TotalAllocatedFounder = InitialFounderToken*(10**uint256(decimals));
    TotalAllocatedAdvisorToken = InitialAllocatedAdvisorToken*(10**uint256(decimals));
    CompanyHoldingValue = InitialCompanyHoldingValue*(10**uint256(decimals));
-    BountyAllocated = totalBountyAllocated*(10**uint256(decimals));
+   BountyAllocated = totalBountyAllocated*(10**uint256(decimals));
    
 
    ICOHardlimit = ICOHardlimit.mul(10**uint256(decimals));
    ICOSoftlimit = ICOSoftlimit.mul(10**uint256(decimals));
+   
    balances[msg.sender] = totalSupply;
+   
+  FounderBalances[msg.sender] = TotalAllocatedFounder;
+  AdvisorBalances[msg.sender] = TotalAllocatedAdvisorToken;
+  TeamBalances[msg.sender] = TotalAllocatedTeamToken;
+  CompanyHoldingBalances[msg.sender] = CompanyHoldingValue;
+  BountyBalances[msg.sender]  = BountyAllocated;
+   
+  
    BountyDistriuted = 0;
  
   }
@@ -256,8 +268,49 @@ function totalSupply() public constant returns (uint256) {
     pauseICO = _status;
    }
 
- 
-   
-  
+//Check if token is available for further Distribution to Admin
+ function InterTransferToAdmin(address addr,
+                     uint256 TokenAmount,
+                     uint8 AdminType )   internal  returns(bool)
+ {
+     
 
+     if(AdminType == uint8(BrightCoinAdminType.Founder))
+    {
+        require(TokenAmount <= FounderBalances[msg.sender]);
+         balances[addr] = balances[addr].add(TokenAmount);
+         FounderBalances[msg.sender] = FounderBalances[msg.sender].sub(TokenAmount);
+        // emit Transfer(msg.sender, addr, TokenAmount);
+      return true;
+    }
+    else if (AdminType == uint8(BrightCoinAdminType.Advisor))
+    {
+      require(TokenAmount <= AdvisorBalances[msg.sender]);
+      balances[addr] = balances[addr].add(TokenAmount);
+      AdvisorBalances[msg.sender] = AdvisorBalances[msg.sender].sub(TokenAmount);
+     // emit Transfer(msg.sender, addr, TokenAmount);
+      return true;
+    }
+    else if(AdminType == uint8(BrightCoinAdminType.Team))
+    {
+      require(TokenAmount <= TeamBalances[msg.sender]);
+      balances[addr] = balances[addr].add(TokenAmount);
+      TeamBalances[msg.sender] = TeamBalances[msg.sender].sub(TokenAmount);
+     // emit Transfer(msg.sender, addr, TokenAmount);
+      return true;
+
+    }  
+    
+    
+ }
+    //Check if token is available for further Distribution to Advisor
+ function InternalBountyTransfer(address addr, uint256 Tokenamount)  internal returns(bool)
+ {
+     require(Tokenamount <= BountyBalances[msg.sender]);
+     balances[addr] = balances[addr].add(Tokenamount);
+     BountyBalances[msg.sender] = BountyBalances[msg.sender].sub(Tokenamount);
+    emit Transfer(msg.sender, addr, Tokenamount);
+     return true;
+ }  
+ 
 }

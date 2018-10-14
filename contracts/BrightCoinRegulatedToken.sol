@@ -26,21 +26,19 @@ contract BrightCoinRegulatedToken  is BrightCoinERC20
 
 BrightCoinInvestorKYC InvestorKYCInfo;
 BrightCoinInvestorAccreditationCheck AccreditationInfo;
-//BrightCoinTokenLock  TokenLockDetails;
+
 
 address public BrightCoinInvestorKYCAddress; 
 address public BrightCoinInvestorAccreditationAddress; 
 mapping(address => uint256) private InvestorBalances;
 mapping(address => bool) private CalculatetokenWithMainSalePeriod;
-bool AccridetionSupport;
+bool InvestorSecurity;
 bool KYCSupport;
 
 constructor() public 
 {
-
-AccridetionSupport = true;
-KYCSupport = true;
-	
+ InvestorSecurity = false;
+ KYCSupport = false;
 }
 
 function GetCurrentTime() view public returns(uint256)
@@ -56,10 +54,10 @@ function calculateTokenmount()  private {
      require(InvestorKYCInfo.CheckKYCStatus(msg.sender,now) == true);
   }
     
-    if(AccridetionSupport == true)
+ if(InvestorSecurity == true)
     {
         //On the Basis of ICO type we will have checks for specific Investor
-        require(AccreditationInfo.checkInvestorValidity(msg.sender,now, ICOType) == true);
+        require(AccreditationInfo.checkInvestorValidity(msg.sender, ICOType) == true);
    }
     
    require(msg.value > 0);
@@ -74,7 +72,7 @@ function calculateTokenmount()  private {
 
          uint256 preSaleFinalToken = InvestorBalances[msg.sender].add(tokens);
         require(preSaleFinalToken <= getMaxCoinSoldDuringPreSale(decimals));
-         require(CheckIfHardlimitAchived(preSaleFinalToken) == true);  // to be fix 
+        require(CheckIfHardlimitAchived(preSaleFinalToken) == true);  // to be fix 
 
          InvestorBalances[msg.sender] =  preSaleFinalToken;   
           CalculatetokenWithMainSalePeriod[msg.sender] = false;
@@ -126,14 +124,14 @@ function () external payable
       require(currenttime >0);
       require(tokenlockPeriod > 0);
 
-      uint256 tokenTimeLock = now.add(tokenlockPeriod);
+     uint256 tokenTimeLock = now.add(tokenlockPeriod);
        
         if((MainSalePeriodIndex == 0) && (PreSaleOn == true))  //PreSale
         {
         
-        if(AccridetionSupport == true)
+        if(InvestorSecurity == true)
         {
-         require(AccreditationInfo.checkInvestorValidity(AddrOfInvestor,currenttime,ICOType) == true);
+         require(AccreditationInfo.checkInvestorValidity(AddrOfInvestor,ICOType) == true);
         }
 
         uint256 tokens = InvestorBalances[AddrOfInvestor];
@@ -150,9 +148,9 @@ function () external payable
             {
 
               require(CheckTokenPeriodSale(currenttime,MainSalePeriodIndex) == true);
-              if(AccridetionSupport == true)
+              if(InvestorSecurity == true)
               {
-                require(AccreditationInfo.checkInvestorValidity(AddrOfInvestor,currenttime,ICOType) == true);    
+                require(AccreditationInfo.checkInvestorValidity(AddrOfInvestor,ICOType) == true);    
               }
 
               SetTokenLock(AddrOfInvestor,tokenTimeLock,InvestorBalances[AddrOfInvestor]);
@@ -164,52 +162,58 @@ function () external payable
 
   }
 
-  
 
   //This method will be called when investor  wants to tranfer token to other.  
 function transfer(address newInvestor, uint256 tokens) public returns (bool) 
-  {     
+ {     
        require(pauseICO == false);  //if this flag is true the no operation is allowed.
       if(KYCSupport == true)
       {
-        //check KYC info of both Investor and Token Provider 
+        //check KYC info of newInvestor  and Token Provider 
         require(InvestorKYCInfo.CheckKYCStatus(newInvestor,now) == true); 
       }
 
+
       //check if locking period is expired or not 
-     // uint256 currenttime = now + 250 seconds;//For Testing Code to be removed
-       uint256 currenttime = now;
-
-       bool retVal =  isTokenLockExpire(msg.sender,currenttime);
-       if(retVal == true)  //If lock expired then no other check reqired and simply transfer token
+      uint256 currenttime = now;
+      
+      if (InvestorSecurity == true)
       {
-          internaltransfer(newInvestor,tokens);
-          return true;
-      }
-
-      uint256 TokenLockExpiry = getTokenLockExpiry(msg.sender); 
-       if (AccridetionSupport == true)
-      {
+          
+           if(isTokenLockExpire(msg.sender,currenttime) == true)
+           {
+               internaltransfer(newInvestor,tokens);
+                return true;
+           }
+           
+           uint256 TokenLockExpiry = getTokenLockExpiry(msg.sender); 
+           require(TokenLockExpiry !=0);
+         
          if( ICOType != uint8(BrightCoinICOType.Utility))
          {
-            require(AccreditationInfo.checkBothInvestorValidity(msg.sender,newInvestor,currenttime, ICOType) == true); 
-            require(TokenLockExpiry !=0);
+            require(AccreditationInfo.checkBothInvestorValidity(msg.sender,newInvestor, ICOType) == true); 
             SetTokenLock(newInvestor,TokenLockExpiry,tokens);
             internaltransfer(newInvestor,tokens);
             return true; 
          }
          else
          {
-            SetTokenLock(newInvestor,TokenLockExpiry,tokens);
+          SetTokenLock(newInvestor,TokenLockExpiry,tokens);
            internaltransfer(newInvestor,tokens);
            return true;
          }
             
       }
+      else
+      {
+         require(isTokenLockExpire(msg.sender,currenttime) == true);
+         internaltransfer(newInvestor,tokens);
+         return true;
+      }
       
-
-  }
-  
+      
+}
+      
 
 function setKYCAndAccridetionAddres(address _kyc, 
                       address _InvestorAcrridetion ) onlyTokenOwner public 
@@ -222,7 +226,9 @@ function setKYCAndAccridetionAddres(address _kyc,
   InvestorKYCInfo = BrightCoinInvestorKYC(_kyc);
   AccreditationInfo = BrightCoinInvestorAccreditationCheck(_InvestorAcrridetion);
     
-}	
+}
+
+
 
 
 function GetCurrentKYCCount() view public  returns(uint256)
@@ -233,15 +239,15 @@ function GetCurrentKYCCount() view public  returns(uint256)
 
 
 //Set the KYC check implementation
-function setKYCSupport(bool KYCSupportAcquired) 
+function setKYCSupport(bool KYCSupportAcquired) onlyTokenOwner public
 {
   KYCSupport = KYCSupportAcquired;
 }
 
 //Set the Accridition check implementation
-function setAccridetionSupport(bool AccridetionSupportAcquired) 
+function setInvestorSecuritySupport(bool securitySupport) onlyTokenOwner public
 {
-  AccridetionSupport = AccridetionSupportAcquired;
+  InvestorSecurity = securitySupport;
 }
 
 
@@ -249,24 +255,31 @@ function setAccridetionSupport(bool AccridetionSupportAcquired)
  function DistributeTokentoAdmin(address addr , uint256 tokens, 
                       uint256 LockExpiryDateTime,uint8 AdminType ) onlyTokenOwner public returns(bool)
  {
+   require(tokens !=0);
+   require(addr != 0x0);
+   require(LockExpiryDateTime > 0);
    
-   //Transfer Founder token
-   uint256 lockexpiry = now.add(LockExpiryDateTime);
+   uint256 lockexpiry;
 
  bool Addrexists= isAddrExists(addr);
  if(!Addrexists)
  {
-      require(TokenAvailableForAdmin(addr,balances[addr],tokens,AdminType) == true);
-      AddAdminToken(addr,tokens,lockexpiry,true,AdminType);
-      SetTokenLock(addr,lockexpiry,tokens);
-      balances[addr] = tokens;
+    require(InterTransferToAdmin(addr,tokens,AdminType) == true);
+    lockexpiry = now.add(LockExpiryDateTime);
+    AddAdminToken(addr,tokens,lockexpiry,true,AdminType);
+     emit Transfer(msg.sender, addr, tokens);
+    SetTokenLock(addr,lockexpiry,tokens);
+     
   }
   else
-  {
-      require(TokenAvailableForAdmin(addr,balances[addr],tokens,AdminType) == true);
+ {
+      require(InterTransferToAdmin(addr,tokens,AdminType) == true);
+        //Transfer Founder token
+      lockexpiry = now.add(LockExpiryDateTime);
       UpdateAdminTokenDetails(addr,tokens,lockexpiry,AdminType);
-      IncreaseTokenAmount(addr,lockexpiry,tokens);
-      balances[addr] = balances[addr].add(tokens);
+      emit Transfer(msg.sender, addr, tokens);
+     IncreaseTokenAmount(addr,lockexpiry,tokens);
+  
   }
 
   return true;
@@ -274,23 +287,17 @@ function setAccridetionSupport(bool AccridetionSupportAcquired)
  }
 
  
-  function TranferCompanyHoldingTokens(uint256 lockExpiry)  onlyTokenOwner public returns(bool)
-  { 
-
-      uint256 Holdinglockexpiry = now.add(lockExpiry);
-      balances[CompanyHoldingAddress] = CompanyHoldingValue;
-       SetTokenLock(CompanyHoldingAddress,Holdinglockexpiry,CompanyHoldingValue);
-      
-      return true;
-
-
- } 
-
+  
   function TransferTokenBountyOwner() onlyTokenOwner public
   {
-      require(BountyAllocated !=0 );
-      balances[BountyTokenHolder] = BountyAllocated;
+  
+      require(BountyBalances[msg.sender] !=0 );
+      balances[BountyTokenHolder] = BountyBalances[msg.sender];
+      BountyBalances[msg.sender] = 0;
+      emit Transfer(msg.sender, BountyTokenHolder, BountyAllocated);
+      
   }
+
 
  function TransferBountyToken(address addr, uint256 _token, uint256 lockExpiry,
                   bool locked) onlyBountyTokenOwner public returns(bool)
@@ -298,23 +305,36 @@ function setAccridetionSupport(bool AccridetionSupportAcquired)
 
      require(_token != 0);
      require(lockExpiry > 0);
-     require( TokenAvailableForBounty(balances[BountyTokenHolder],_token) == true, "Token Not Available");
+     require( InternalBountyTransfer(addr,_token) == true, "Token Not Available");
    
      //now check if lock to provided or not
      if(locked == true)
      {
           //Setlocking for the Bounty Account
-         SetTokenLock(addr, lockExpiry,_token);
+       SetTokenLock(addr, lockExpiry,_token);
      }
      else
       {
        SetTokenLock(addr, 0,_token); //Token details set with no locking period
       }
-      internaltransfer(addr,_token);
-
 
    }
-
    
+   
+
+   function TransferCompanyHoldingTokens(uint256 lockExpiry)  onlyTokenOwner public returns(bool)
+  { 
+    
+      require(CompanyHoldingBalances[msg.sender] == CompanyHoldingValue) ; 
+      uint256 Holdinglockexpiry = now.add(lockExpiry);
+     
+      balances[CompanyHoldingAddress] = CompanyHoldingBalances[msg.sender];
+    CompanyHoldingBalances[msg.sender] = 0;
+   SetTokenLock(CompanyHoldingAddress,Holdinglockexpiry,CompanyHoldingValue);
+      emit Transfer(msg.sender, CompanyHoldingAddress, CompanyHoldingValue);
+      return true;
+
+ } 
+
 
 }

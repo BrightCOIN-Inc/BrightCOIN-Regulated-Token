@@ -3,6 +3,7 @@ import "./SafeMath.sol";
 import "./BrightCoinTokenOwner.sol";
 
 
+
 contract BrightCoinInvestorTokenLock is  BrightCoinTokenOwner
 {
 
@@ -71,7 +72,7 @@ enum BrightCoinLockType { Investor, Admin,Bounty }
             return am;
     }
     
-    function isTokenLockExpire(address _of, uint256 _time) internal view  returns(bool)
+    function isTokenLockExpire(address _of, uint256 _time)  view internal  returns(bool)
     {
         bool retVal = false;
 
@@ -81,13 +82,13 @@ enum BrightCoinLockType { Investor, Admin,Bounty }
             return retVal;
     }
 
-    function getTokenLockExpiry(address _of) internal   view returns(uint256 )
+    function getTokenLockExpiry(address _of)  view internal returns(uint256 )
     {
        return  locktokenDetails[_of].validity;
     }
 
 
-    function isAddrExists(address addr)   internal  view  returns(bool)
+    function isAddrExists(address addr) view internal returns(bool)
     {
         
        lockToken storage lockBounty = locktokenDetails[addr];
@@ -99,7 +100,7 @@ enum BrightCoinLockType { Investor, Admin,Bounty }
     
     
      function SetTokenLock(address _of, uint256 _time, 
-         uint256 _amount)  internal  
+         uint256 _amount)  internal   
           {
               
                //uint256 validUntil = now.add(_time); //solhint-disable-line

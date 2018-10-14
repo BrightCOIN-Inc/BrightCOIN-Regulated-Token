@@ -20,7 +20,7 @@ uint256 public constant USAGeoLocation = 1;
 
 constructor() public
 {
-  //owner = _owner;
+  
 }
 
 struct AccreditedInvestor
@@ -37,8 +37,13 @@ struct AccreditedInvestor
      address[] public accreditedInvestors;
 
      /* Function to Add Investor details*/
-     function  AddInvestorAccreditionDetails(address Investoraddr,bool AccreditionStatus,uint256 AccreditionExpiryDateTime,uint256 InvestorGeoLocation, string ipfsHashRegDInvestor )
-      onlyTokenOwner public {
+     function  AddInvestorAccreditionDetails(address Investoraddr,
+                                            bool AccreditionStatus,
+                                            uint256 AccreditionExpiryDateTime,
+                                            uint256 InvestorGeoLocation, 
+                                            string ipfsHashRegDInvestor )
+                                            onlyTokenOwner public
+      {
       
       require(Investoraddr != 0x0);
       require(AccreditionExpiryDateTime > 0);
@@ -57,19 +62,24 @@ struct AccreditedInvestor
 
 
 
- function GetGeoLocationAccreditedInvestor(address AccreditedInvestoraddr ) view internal returns(uint256)
+ function GetGeoLocationAccreditedInvestor(address AccreditedInvestoraddr )
+                                view  public returns(uint256)
  {
       AccreditedInvestor storage structAccredited =  AccreditedInvestorDetails[AccreditedInvestoraddr];
+      require(structAccredited.InvestorGeoLocation !=0, "Geolocation Should not be zero");
       return structAccredited.InvestorGeoLocation;
  }
 
-function SetAccreditionStatus(address investorAddress, bool status) onlyTokenOwner public
+function SetAccreditionStatus(address investorAddress,
+                                    bool status)
+                                    onlyTokenOwner public
 {
     require(investorAddress != 0);
     AccreditedInvestor storage structAccredited =  AccreditedInvestorDetails[investorAddress];
     structAccredited.AccreditionStatus = status;
 }
- function CheckAccreditionStatus( address AccreditedInvestoraddr, uint256 currentdatetime)  view internal 
+
+ function CheckAccreditionStatus( address AccreditedInvestoraddr)  view  public 
  returns(bool)
  {
    AccreditedInvestor storage structAccredited =  AccreditedInvestorDetails[AccreditedInvestoraddr];
@@ -83,33 +93,6 @@ function SetAccreditionStatus(address investorAddress, bool status) onlyTokenOwn
       AccreditedInvestor storage structAccredited =  AccreditedInvestorDetails[AccreditedInvestoraddr];
       structAccredited.AccreditionExpiryDateTime = expiryDateTime;
   }
-
-/*
- function SetLockingPeriodAccreditedInvestor(address structAccreditedInvestoraddr, uint256 expiryDateTime, uint256 tokenamount)  internal {
-
-  require(expiryDateTime > 0);
-  require(structAccreditedInvestoraddr != 0x0);
-
-  AccreditedInvestor storage structAccredited =  AccreditedInvestorDetails[structAccreditedInvestoraddr];
-
-  structAccredited.lockInEndDate =  expiryDateTime;
-  structAccredited.TokenPurchased  = structAccredited.TokenPurchased.add(tokenamount);
-  
-
- }
- */
-
- /*function GetTokenLockExpiryDateTimeAccreditedInvestor(address structAccreditedInvestoraddr) view  internal  returns(uint256) {
-
- if(structAccreditedInvestoraddr != 0x0)
- {
-    AccreditedInvestor storage structAccredited =  AccreditedInvestorDetails[structAccreditedInvestoraddr];
-    return structAccredited.lockInEndDate;
- }
- return 0;
- 
- }
- */
 
 
  }
