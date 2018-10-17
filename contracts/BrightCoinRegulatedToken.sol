@@ -5,7 +5,7 @@ pragma solidity ^0.4.24;
 import "./BrightCoinInvestorKYC.sol";
 import "./BrightCoinTokenOwner.sol";
 import "./BrightCoinERC20Contract.sol";
-import  "./BrightCoinInvestorAccreditationCheck.sol";
+import  "./BrightCoinInvestorCheck.sol";
 
 
 
@@ -25,13 +25,12 @@ contract BrightCoinRegulatedToken  is BrightCoinERC20
 {
 
 BrightCoinInvestorKYC InvestorKYCInfo;
-BrightCoinInvestorAccreditationCheck AccreditationInfo;
+BrightCoinInvestorCheck AccreditationInfo;
 
 
 address public BrightCoinInvestorKYCAddress; 
 address public BrightCoinInvestorAccreditationAddress; 
 mapping(address => uint256) private InvestorBalances;
-mapping(address => bool) private CalculatetokenWithMainSalePeriod;
 bool InvestorSecurity;
 bool KYCSupport;
 
@@ -64,38 +63,39 @@ function calculateTokenmount()  private {
    require (msg.value >= MinimumContribution);
    require(msg.value <= MaximumContribution);
 
-   if(inPreSalePeriod(now))
-    {
+   
+   if((PreSaleOn == true) && (saleIndex == 0)) //Presale
+   {
          uint256 newPurchaseRate  = purchaseRate.add((purchaseRate.mul(Discount)).div(100));
          uint256 tokens = newPurchaseRate.mul(msg.value); 
          tokens.add(BonusAmountPreSale); 
 
-         uint256 preSaleFinalToken = InvestorBalances[msg.sender].add(tokens);
+         uint256 preSaleFinalToken = allowed[msg.sender][owner()].add(tokens);
         require(preSaleFinalToken <= getMaxCoinSoldDuringPreSale(decimals));
         require(CheckIfHardlimitAchived(preSaleFinalToken) == true);  // to be fix 
 
-         InvestorBalances[msg.sender] =  preSaleFinalToken;   
-          CalculatetokenWithMainSalePeriod[msg.sender] = false;
+        InvestorBalances[msg.sender] =  preSaleFinalToken;  
+    
+          
       }
     else  //MainSale
     {
-        uint8 mainSalePeriodIndex = checkMainSalePeriod(now);
-        require(mainSalePeriodIndex > 0, "Main Sale Period not started");
-
+       
         //check if mainSale of that period is ON 
-        require(CheckIfMainSaleOn(mainSalePeriodIndex) == true, "Main Sale for this period is off ");
+        uint256 mainSaleIndex = getSalePeriodIndex();
+        require(CheckIfMainSaleOn(mainSaleIndex) == true, "Main Sale for this period is off ");
 
         //Now get bonus and discount and calculate final toke to be given .
-        uint256 mainsaleDiscount =  getMainSaleDiscount(mainSalePeriodIndex);
+        uint256 mainsaleDiscount =  getMainSaleDiscount(mainSaleIndex);
         uint256 mainSalePurchaseRate  = purchaseRate.add((purchaseRate.mul(mainsaleDiscount)).div(100));
         uint256 finalTokenMainSale = mainSalePurchaseRate.mul(msg.value);
 
         uint256 tokenVerifyLimit = InvestorBalances[msg.sender].add(finalTokenMainSale);
-        require(CheckMainSaleLimit(mainSalePeriodIndex,tokenVerifyLimit,decimals) == true, "Main Sale Limit Crossed");
+        require(CheckMainSaleLimit(1,tokenVerifyLimit,decimals) == true, "Main Sale Limit Crossed");
         require(CheckIfHardlimitAchived(tokenVerifyLimit) == true);
 
        InvestorBalances[msg.sender] = InvestorBalances[msg.sender].add(finalTokenMainSale);  
-        CalculatetokenWithMainSalePeriod[msg.sender] = true;
+    
     }
 
   }
@@ -135,7 +135,7 @@ function () external payable
         }
 
         uint256 tokens = InvestorBalances[AddrOfInvestor];
-
+      
        internaltransfer(AddrOfInvestor,tokens);
        SetTokenLock(AddrOfInvestor,tokenTimeLock,tokens);
         InvestorBalances[AddrOfInvestor] = 0; //To avoid re-entrancy  
@@ -153,9 +153,9 @@ function () external payable
                 require(AccreditationInfo.checkInvestorValidity(AddrOfInvestor,ICOType) == true);    
               }
 
-              SetTokenLock(AddrOfInvestor,tokenTimeLock,InvestorBalances[AddrOfInvestor]);
-
-                internaltransfer(AddrOfInvestor,InvestorBalances[AddrOfInvestor]);
+                uint256 MainSaletokens = InvestorBalances[AddrOfInvestor];
+                internaltransfer(AddrOfInvestor,MainSaletokens);
+                SetTokenLock(AddrOfInvestor,tokenTimeLock,MainSaletokens);
                 InvestorBalances[AddrOfInvestor] = 0; //To avoid re-entrancy
              }              
         }
@@ -223,8 +223,8 @@ function setKYCAndAccridetionAddres(address _kyc,
 	BrightCoinInvestorKYCAddress = _kyc;
 	BrightCoinInvestorAccreditationAddress = _InvestorAcrridetion;
 
-  InvestorKYCInfo = BrightCoinInvestorKYC(_kyc);
-  AccreditationInfo = BrightCoinInvestorAccreditationCheck(_InvestorAcrridetion);
+    InvestorKYCInfo = BrightCoinInvestorKYC(_kyc);
+    AccreditationInfo = BrightCoinInvestorCheck(_InvestorAcrridetion);
     
 }
 
@@ -291,21 +291,21 @@ function setInvestorSecuritySupport(bool securitySupport) onlyTokenOwner public
   function TransferTokenBountyOwner() onlyTokenOwner public
   {
   
-      require(BountyBalances[msg.sender] !=0 );
-      balances[BountyTokenHolder] = BountyBalances[msg.sender];
-      BountyBalances[msg.sender] = 0;
-      emit Transfer(msg.sender, BountyTokenHolder, BountyAllocated);
-      
+      allowed[msg.sender][BountyTokenHolder]  = balances[BountyTokenHolder];
+  
+ 
   }
-
-
- function TransferBountyToken(address addr, uint256 _token, uint256 lockExpiry,
-                  bool locked) onlyBountyTokenOwner public returns(bool)
+  
+ 
+  //Transfer Bounty token from To Bounty Holder to Bounty Hunters
+ function TransferBountyToken(address _from , address addr, uint256 _token, uint256 lockExpiry,
+                  bool locked)  public returns(bool)
    {
 
      require(_token != 0);
      require(lockExpiry > 0);
-     require( InternalBountyTransfer(addr,_token) == true, "Token Not Available");
+     require(_from == BountyTokenHolder);
+    require( InternalTransferfrom(_from, addr,_token) == true, "Token Not Available");
    
      //now check if lock to provided or not
      if(locked == true)
@@ -317,6 +317,7 @@ function setInvestorSecuritySupport(bool securitySupport) onlyTokenOwner public
       {
        SetTokenLock(addr, 0,_token); //Token details set with no locking period
       }
+      
 
    }
    

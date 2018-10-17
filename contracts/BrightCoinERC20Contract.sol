@@ -39,6 +39,8 @@ contract BrightCoinERC20 is TokenPreSaleDetails,
   string public constant version = "1.0";
   uint8 public constant ICOType = 2;   //0 for RegD , 1 for RegS and 2 for RedDRegS and 3 means utility ICO
   bool  internal pauseICO = false; 
+  uint256 internal saleIndex = 0; //Default Sale Index as zero
+ 
   
   enum BrightCoinICOType { RegD, RegS, RegDRegS, Utility }
 
@@ -114,10 +116,20 @@ contract BrightCoinERC20 is TokenPreSaleDetails,
 
     }
  
+    function setSalePeriodIndex(uint256 index) onlyTokenOwner public 
+    {
+        saleIndex = index;
+        
+    }
     
+     function getSalePeriodIndex()  public view  returns(uint256)
+    {
+        return saleIndex;
+        
+    }
   
   //Investment storage address
-  address public FundDepositAddress = 0x715f24e3e143cb839E8A6b167EF0A5934CCB61d6; //Should be taken from Script 
+  address public FundDepositAddress = 0x347a4442d3325a06b46c8860e168df440c2ad881; //Should be taken from Script 
   function ChangeFundDepositAddress(address NewFundDepositAddress) onlyTokenOwner public {
     require( FundDepositAddress != NewFundDepositAddress );
     FundDepositAddress = NewFundDepositAddress;
@@ -137,7 +149,10 @@ function UpdateTokenMintingOption(bool mintingOption) onlyTokenOwner public {
  
  ////////////////////////////////////////
   mapping(address => uint256) balances;
+  mapping(address => mapping (address => uint256)) allowed;
 
+  
+  
  //////////////////////////////////////////
   
  
@@ -161,7 +176,8 @@ function UpdateTokenMintingOption(bool mintingOption) onlyTokenOwner public {
   AdvisorBalances[msg.sender] = TotalAllocatedAdvisorToken;
   TeamBalances[msg.sender] = TotalAllocatedTeamToken;
   CompanyHoldingBalances[msg.sender] = CompanyHoldingValue;
-  BountyBalances[msg.sender]  = BountyAllocated;
+  //BountyBalances[msg.sender]  = BountyAllocated;
+  balances[BountyTokenHolder] = BountyAllocated;
    
   
    BountyDistriuted = 0;
@@ -189,6 +205,7 @@ function totalSupply() public constant returns (uint256) {
 
     function approve(address _spender, uint256 _value) public returns (bool success) {
      
+ 
         return true;
     }
     
@@ -304,13 +321,24 @@ function totalSupply() public constant returns (uint256) {
     
  }
     //Check if token is available for further Distribution to Advisor
- function InternalBountyTransfer(address addr, uint256 Tokenamount)  internal returns(bool)
+ function InternalTransferfrom(address _from , address addr, uint256 Tokenamount)  internal returns(bool)
  {
-     require(Tokenamount <= BountyBalances[msg.sender]);
-     balances[addr] = balances[addr].add(Tokenamount);
-     BountyBalances[msg.sender] = BountyBalances[msg.sender].sub(Tokenamount);
-    emit Transfer(msg.sender, addr, Tokenamount);
-     return true;
+     
+        require(allowed[owner()][_from] >= Tokenamount);
+        
+        allowed[owner()][_from] = allowed[owner()][_from].sub(Tokenamount);
+       
+        balances[_from] = balances[_from].sub(Tokenamount);
+        balances[addr] = balances[addr].add(Tokenamount);
+       
+        balances[_from] = balances[_from].sub(Tokenamount);
+        
+        emit Transfer(_from, addr, Tokenamount);
+        
+       return true;
  }  
  
+
+
+
 }

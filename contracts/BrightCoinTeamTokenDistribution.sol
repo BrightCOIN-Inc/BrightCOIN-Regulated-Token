@@ -15,7 +15,7 @@ constructor() public
 
 //Team Distribution  
  //There might be multiple entry to this
- uint256 public constant InitialAllocatedTeamToken = 2000;  // Token token allocated for Team distribution
+ uint256 internal constant InitialAllocatedTeamToken = 2000;  // Token token allocated for Team distribution
  uint256 public TotalAllocatedTeamToken;
  
  

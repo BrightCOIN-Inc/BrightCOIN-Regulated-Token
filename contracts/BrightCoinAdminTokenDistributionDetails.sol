@@ -33,7 +33,7 @@ uint256 public CurrentAllocatedFounderToken = 0; //To be taken as it is
 
 
  //Company Holdings
- address public constant CompanyHoldingAddress = 0x4c04c94444df14d7843eeb8b64a7dba62eab7a3e;//To be updated via Script
+ address public constant CompanyHoldingAddress = 0xfedf9e65af88f215738e74114cb2c2218076f8b5;
  uint256 public constant InitialCompanyHoldingValue = 40000;// Value to be updated via Script
  uint256 public CompanyHoldingValue = 0;
 
@@ -42,7 +42,7 @@ uint256 public CurrentAllocatedFounderToken = 0; //To be taken as it is
 //Bounty Token Distribution
 uint256 public constant totalBountyAllocated = 3000;
 uint256 public BountyAllocated = 0;
-address public  constant BountyTokenHolder = 0x403f4fedf6127f30e77ae8295dea47eea0832899; //This address own the token and finally transfer
+address public  constant BountyTokenHolder = 0x30533279DeF53608a38e9147E7B648d16A0A84Fb; //This address own the token and finally transfer
   modifier onlyBountyTokenOwner() {
         require(msg.sender == BountyTokenHolder, " Bounty Owner Not Authorized");
         _;

@@ -16,7 +16,7 @@ constructor() public
 
 }
   //There might be multiple entry to this
- uint256 public constant InitialAllocatedAdvisorToken = 5000;
+ uint256 internal constant InitialAllocatedAdvisorToken = 5000;
  uint256 public TotalAllocatedAdvisorToken;
  
  

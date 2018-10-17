@@ -106,13 +106,23 @@ enum BrightCoinLockType { Investor, Admin,Bounty }
                //uint256 validUntil = now.add(_time); //solhint-disable-line
 
                  require(_amount != 0);
-                 require(tokensLocked(_of) == 0);
-                lockToken storage AddrStruct =  locktokenDetails[_of];
+                 require(_of != 0x0);
+
+                 lockToken storage AddrStruct =  locktokenDetails[_of];
+                 if(tokensLocked(_of) > 0)
+                 {
+                      
+                        AddrStruct.amount = (AddrStruct.amount).add(_amount);
+                        AddrStruct.validity = _time;
+                 }
+                 else
+                 {
         
-                 AddrStruct.amount = _amount;
-                AddrStruct.validity = _time;
-                AddrStruct.exists = true;
-                AddrStruct.claimed = false;
+                        AddrStruct.amount = _amount;
+                        AddrStruct.validity = _time;
+                        AddrStruct.exists = true;
+                        AddrStruct.claimed = false;
+                 }
           }
 
           function IncreaseTokenAmount(address addr, uint256 validity,uint256 amount)
