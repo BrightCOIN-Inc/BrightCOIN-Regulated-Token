@@ -91,10 +91,10 @@ function calculateTokenmount()  private {
         uint256 finalTokenMainSale = mainSalePurchaseRate.mul(msg.value);
 
         uint256 tokenVerifyLimit = InvestorBalances[msg.sender].add(finalTokenMainSale);
-        require(CheckMainSaleLimit(1,tokenVerifyLimit,decimals) == true, "Main Sale Limit Crossed");
+        require(CheckMainSaleLimit(mainSaleIndex,tokenVerifyLimit,decimals) == true, "Main Sale Limit Crossed");
         require(CheckIfHardlimitAchived(tokenVerifyLimit) == true);
 
-       InvestorBalances[msg.sender] = InvestorBalances[msg.sender].add(finalTokenMainSale);  
+       InvestorBalances[msg.sender] = tokenVerifyLimit;//InvestorBalances[msg.sender].add(finalTokenMainSale);  
     
     }
 
