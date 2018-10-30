@@ -88,10 +88,10 @@ enum BrightCoinLockType { Investor, Admin,Bounty }
     }
 
 
-    function isAddrExists(address addr) view internal returns(bool)
+    function isAddrExists(address _addr) view internal returns(bool)
     {
         
-       lockToken storage lockBounty = locktokenDetails[addr];
+       lockToken storage lockBounty = locktokenDetails[_addr];
           return lockBounty.exists;
        
            
@@ -125,15 +125,15 @@ enum BrightCoinLockType { Investor, Admin,Bounty }
                  }
           }
 
-          function IncreaseTokenAmount(address addr, uint256 validity,uint256 amount)
-        onlyTokenOwner public 
+          function IncreaseTokenAmount(address _addr, uint256 _validity,uint256 _amount)
+         internal 
         returns (bool)
     {
        
-        require(tokensLocked(addr) > 0);
-         lockToken storage AddrStruct =  locktokenDetails[addr];
-        AddrStruct.amount = (AddrStruct.amount).add(amount);
-        AddrStruct.validity = validity;
+        require(tokensLocked(_addr) > 0);
+         lockToken storage AddrStruct =  locktokenDetails[_addr];
+        AddrStruct.amount = (AddrStruct.amount).add(_amount);
+        AddrStruct.validity = _validity;
        
        // emit Locked(msg.sender, _reason, locked[msg.sender][_reason].amount, locked[msg.sender][_reason].validity);
         return true;

@@ -13,72 +13,72 @@ constructor() public
 
 }
     
-struct BrightCoinInvestorKYCstruct {
+struct brightCoinInvestorKYCstruct {
 
     address whitelistedAddress; // Whitelist customer address
-    bool KYCStatus;  //KYC Done Status
-    uint256 KYCExpiryDateTime; //KYC Expity Date Time
-    string ipfsHashKYC; //It must contains the details of Investor
+    bool kycStatus;  //KYC Done Status
+    uint256 kycExpiryDateTime; //KYC Expity Date Time
+    string kycIPFSHash; //It must contains the details of Investor
   }
 
-mapping(address => BrightCoinInvestorKYCstruct) BrightCoinInvestorKYCDetails;
-address[] public BrightCoinInvestorKYCAddr;
+mapping(address => brightCoinInvestorKYCstruct) brightCoinInvestorKYCDetails;
+address[] public brightCoinInvestorKYCAddr;
 
-function SetKYCDetailsofInvestor(address InvestordAddress,bool KYCStatus,
-                                uint256 KYCExpiryDateTime, string ipfsHashKYC) onlyTokenOwner public 
+function SetKYCDetailsofInvestor(address _investordAddress,bool _kycStatus,
+                                uint256 _kycExpiryDateTime, string _ipfsHashKYC) public onlyTokenOwner  
  {
 
-       BrightCoinInvestorKYCstruct storage InvestorKYC = BrightCoinInvestorKYCDetails[InvestordAddress];
-       InvestorKYC.whitelistedAddress = InvestordAddress;
-       InvestorKYC.KYCStatus = KYCStatus;
-       InvestorKYC.KYCExpiryDateTime = KYCExpiryDateTime;
-       InvestorKYC.ipfsHashKYC = ipfsHashKYC;
-       BrightCoinInvestorKYCAddr.push(InvestordAddress);
+       brightCoinInvestorKYCstruct storage investorKYC = brightCoinInvestorKYCDetails[_investordAddress];
+       investorKYC.whitelistedAddress = _investordAddress;
+       investorKYC.kycStatus = _kycStatus;
+       investorKYC.kycExpiryDateTime = _kycExpiryDateTime;
+       investorKYC.kycIPFSHash = _ipfsHashKYC;
+       brightCoinInvestorKYCAddr.push(_investordAddress);
    }
 
-  function SetKYCStatus(address InvestorAddress, bool kycStatus) onlyTokenOwner public 
+  function SetKYCStatus(address _investorAddress, bool _kycStatus) public onlyTokenOwner  
   {
 
-    require(InvestorAddress != 0x0);
+    require(_investorAddress != 0x0);
 
-    BrightCoinInvestorKYCstruct storage InvestorKYC = BrightCoinInvestorKYCDetails[InvestorAddress];
-    InvestorKYC.KYCStatus = kycStatus;
+    brightCoinInvestorKYCstruct storage investorKYC = brightCoinInvestorKYCDetails[_investorAddress];
+    investorKYC.kycStatus = _kycStatus;
 
   }
-function CheckKYCStatus(address InvestordAddress,uint256 currentDateTime)  public view returns(bool)
+function CheckKYCStatus(address _investordAddress,uint256 _currentDateTime)  public view returns(bool)
 {
-    require(InvestordAddress != 0x0);
-    require(currentDateTime != 0);
+    require(_investordAddress != 0x0);
+    require(_currentDateTime != 0);
 
-    BrightCoinInvestorKYCstruct storage InvestorKYC = BrightCoinInvestorKYCDetails[InvestordAddress];
+    brightCoinInvestorKYCstruct storage InvestorKYC = brightCoinInvestorKYCDetails[_investordAddress];
 
-    return InvestorKYC.KYCStatus;
+    return InvestorKYC.kycStatus;
 }
 
 
 
-function GetKYCDetails(address InvestordAddress)  public view returns(string)
+function GetKYCDetails(address _investordAddress)  public view returns(string)
 { 
     
-    BrightCoinInvestorKYCstruct storage InvestorKYC = BrightCoinInvestorKYCDetails[InvestordAddress];
-    return InvestorKYC.ipfsHashKYC;
+    brightCoinInvestorKYCstruct storage investorKYC = brightCoinInvestorKYCDetails[_investordAddress];
+    return investorKYC.kycIPFSHash;
 }
 
 
-function SetKYCExpiryDateTime(address InvestordAddress,uint256 expiryDateTime)  onlyTokenOwner public 
+function SetKYCExpiryDateTime(address _investordAddress,uint256 _expiryDateTime)  public onlyTokenOwner  
 {
 
-     require(InvestordAddress != 0x0);
-    require(expiryDateTime != 0);
-    BrightCoinInvestorKYCstruct storage InvestorKYC = BrightCoinInvestorKYCDetails[InvestordAddress];
-    InvestorKYC.KYCExpiryDateTime = expiryDateTime;
+     require(_investordAddress != 0x0);
+    require(_expiryDateTime != 0);
+    brightCoinInvestorKYCstruct storage investorKYC = brightCoinInvestorKYCDetails[_investordAddress];
+    investorKYC.kycExpiryDateTime = _expiryDateTime;
 
 }
-function GetKYCExpiryDate(address InvestordAddress)  public view returns(uint256)
+function GetKYCExpiryDate(address _investordAddress)  public view returns(uint256)
 {
     
-    BrightCoinInvestorKYCstruct storage InvestorKYC = BrightCoinInvestorKYCDetails[InvestordAddress];
-    return InvestorKYC.KYCExpiryDateTime;
+    brightCoinInvestorKYCstruct storage investorKYC = brightCoinInvestorKYCDetails[_investordAddress];
+    return investorKYC.kycExpiryDateTime;
 }
 
 
@@ -86,7 +86,7 @@ function GetKYCExpiryDate(address InvestordAddress)  public view returns(uint256
 function GetKYCCount() view public returns(uint256)
 {
     
-    return BrightCoinInvestorKYCAddr.length;
+    return brightCoinInvestorKYCAddr.length;
    
 }
 

@@ -20,38 +20,38 @@ constructor() public
 }
   /////////////////////////////////////////////
 
-    struct NonAccreditedInvestor {
-        address Investor;
-        uint256 InvestorGeoLocation;
+    struct nonAccreditedInvestor {
+        address investor;
+        uint256 investorGeoLocation;
         string ipfsHashRegSInvestor; //It must contains the details of Investor
       
     }
 
-    mapping(address => NonAccreditedInvestor) NonAccreditedInvestorDetails;
-    address[] public NonAccreditedInvestors;
+    mapping(address => nonAccreditedInvestor) nonAccreditedInvestorDetails;
+    address[] public nonAccreditedInvestors;
 
     /*Function to Add Investor details*/
-     function  AddNonAccreditedInvestorDetails(address Investoraddr,
-                             uint256 InvestorGeoLocation,
-                           string ipfsHashRegSInvestor )
-                           onlyTokenOwner public
+     function  AddNonAccreditedInvestorDetails(address _investoraddr,
+                             uint256 _investorGeoLocation,
+                           string _ipfsHashRegSInvestor )
+                           public onlyTokenOwner 
     {
       
-      require(Investoraddr != 0x0);
-       NonAccreditedInvestor storage Investment = NonAccreditedInvestorDetails[Investoraddr];
-       Investment.Investor = Investoraddr;
-       Investment.InvestorGeoLocation = InvestorGeoLocation;
-       Investment.ipfsHashRegSInvestor = ipfsHashRegSInvestor;
-       NonAccreditedInvestors.push(Investoraddr);
+      require(_investoraddr != 0x0);
+       nonAccreditedInvestor storage investment = nonAccreditedInvestorDetails[_investoraddr];
+       investment.investor = _investoraddr;
+       investment.investorGeoLocation = _investorGeoLocation;
+       investment.ipfsHashRegSInvestor = _ipfsHashRegSInvestor;
+       nonAccreditedInvestors.push(_investoraddr);
     }
 
     
- function GetGeoLocationOfNonInvestor(address Investoraddr) 
+ function GetGeoLocationOfNonInvestor(address _investoraddr) 
                 view  public returns(uint256)
  {
-    NonAccreditedInvestor storage structNonAccredeted =  NonAccreditedInvestorDetails[Investoraddr];
-    require(structNonAccredeted.InvestorGeoLocation !=0, "Geolocation Should not be zero");
-    return structNonAccredeted.InvestorGeoLocation;
+    nonAccreditedInvestor storage structNonAccredeted =  nonAccreditedInvestorDetails[_investoraddr];
+    require(structNonAccredeted.investorGeoLocation !=0, "Geolocation Should not be zero");
+    return structNonAccredeted.investorGeoLocation;
  }
 
 

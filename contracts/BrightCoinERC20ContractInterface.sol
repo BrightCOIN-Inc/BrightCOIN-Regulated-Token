@@ -2,15 +2,12 @@ pragma solidity ^0.4.24;
 
 interface ERC20TokenInterface {
     function totalSupply() external constant returns (uint);
-    function balanceOf(address tokenOwner) external constant returns (uint balance);
-    function allowance(address tokenOwner, address spender) external constant returns (uint remaining);
-   // function transfer(address to, uint tokens) external returns (bool success);
-    function approve(address spender, uint tokens) external returns (bool success);
-    function transferFrom(address from, address to, uint tokens) external returns (bool success);
+    function balanceOf(address _tokenOwner) external constant returns (uint balance);
+    function allowance(address _tokenOwner, address spender) external constant returns (uint remaining);
+   // function transfer(address _to, uint _tokens) external returns (bool success);
+    function approve(address _spender, uint _tokens) external returns (bool success);
+    function transferFrom(address _from, address _to, uint _tokens) external returns (bool success);
 
-
- 
-    
 }
 
   

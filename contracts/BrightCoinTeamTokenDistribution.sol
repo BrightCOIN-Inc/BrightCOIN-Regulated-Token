@@ -15,57 +15,56 @@ constructor() public
 
 //Team Distribution  
  //There might be multiple entry to this
- uint256 internal constant InitialAllocatedTeamToken = 2000;  // Token token allocated for Team distribution
  uint256 public TotalAllocatedTeamToken;
  
  
- struct TeamDistribution {
+ struct teamDistribution {
         address addr;
         uint256 tokenamount;
         uint256 lockexpiry;
-        bool   TeamActiveInvestor;  //To Ensure if team is still on
+        bool   teamActiveInvestor;  //To Ensure if team is still on
         bool tokenlocked;
     
     }
 
- mapping(address => TeamDistribution) TeamDistributionDetails;
- address[] public TeamTokenDetailsAddr;
+ mapping(address => teamDistribution) teamDistributionDetails;
+ address[] public teamTokenDetailsAddr;
  
 
  //Team Token Distribution  Starts
 
 //Addng Details to Team Token
- function AddTeam(address NewTeamAddr,uint256 Tokenamount,
- uint256 lockexpirydate,
- bool tokenLocked) onlyTokenOwner  public {
+ function AddTeam(address _newTeamAddr,uint256 _tokenamount,
+ uint256 _lockexpirydate,
+ bool _tokenLocked)  internal {
      
-  TeamDistribution storage TeamDetails = TeamDistributionDetails[NewTeamAddr];
-    TeamDetails.addr = NewTeamAddr;
-    TeamDetails.tokenamount = Tokenamount;
-    TeamDetails.lockexpiry = lockexpirydate;
-    TeamDetails.TeamActiveInvestor = true;
-    TeamDetails.tokenlocked = tokenLocked;
-    TeamTokenDetailsAddr.push(NewTeamAddr);
+  teamDistribution storage teamDetails = teamDistributionDetails[_newTeamAddr];
+    teamDetails.addr = _newTeamAddr;
+    teamDetails.tokenamount = _tokenamount;
+    teamDetails.lockexpiry = _lockexpirydate;
+    teamDetails.teamActiveInvestor = true;
+    teamDetails.tokenlocked = _tokenLocked;
+    teamTokenDetailsAddr.push(_newTeamAddr);
 
  }
 
- function UpdateTeamTokenDetails(address teamaddr,
-                            uint256 Tokenamount,
-                            uint256 LockExpiryDateTime) internal
+ function UpdateTeamTokenDetails(address _teamaddr,
+                            uint256 _tokenamount,
+                            uint256 _lockExpiryDateTime) internal
  {
        //check if Team is Active
-       require(CheckIfTeamActive(teamaddr) == true);
-      TeamDistribution storage TeamDetails = TeamDistributionDetails[teamaddr];
+       require(CheckIfTeamActive(_teamaddr) == true);
+      teamDistribution storage teamDetails = teamDistributionDetails[_teamaddr];
  
-      TeamDetails.tokenamount += Tokenamount;
-      TeamDetails.lockexpiry = LockExpiryDateTime;
+      teamDetails.tokenamount += _tokenamount;
+      teamDetails.lockexpiry = _lockExpiryDateTime;
   
  }
 
- function RemoveTeamFromFurtherInvestment(address NewTeamAddr) onlyTokenOwner public 
+ function RemoveTeamFromFurtherInvestment(address _newTeamAddr) public onlyTokenOwner  
  {
-    TeamDistribution storage TeamDetails = TeamDistributionDetails[NewTeamAddr];
-    TeamDetails.TeamActiveInvestor = false;
+    teamDistribution storage teamDetails = teamDistributionDetails[_newTeamAddr];
+    teamDetails.teamActiveInvestor = false;
 
  }
 
@@ -73,17 +72,17 @@ constructor() public
 
  function TotalTeamnvestor() public view returns(uint256) 
  {
-   return TeamTokenDetailsAddr.length;
+   return teamTokenDetailsAddr.length;
   
  }
 
 //check if Team Removed 
- function CheckIfTeamActive(address TeamAddr) view internal returns(bool)
+ function CheckIfTeamActive(address _teamAddr) view internal returns(bool)
  {
 
-  TeamDistribution storage TeamDetails = TeamDistributionDetails[TeamAddr];
+  teamDistribution storage teamDetails = teamDistributionDetails[_teamAddr];
 
-  if(TeamDetails.TeamActiveInvestor == true)
+  if(teamDetails.teamActiveInvestor == true)
   {
       return true;
   }
@@ -92,11 +91,11 @@ constructor() public
  }
 
  //check Amount with Advisor
- function CheckTeamTokenAmount(address NewTeamAddr) view public returns(uint256)
+ function CheckTeamTokenAmount(address _newTeamAddr) view public returns(uint256)
  {
 
-  TeamDistribution storage TeamDetails = TeamDistributionDetails[NewTeamAddr];
-        return TeamDetails.tokenamount;
+  teamDistribution storage teamDetails = teamDistributionDetails[_newTeamAddr];
+        return teamDetails.tokenamount;
 
  }
 

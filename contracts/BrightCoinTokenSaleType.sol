@@ -1,10 +1,11 @@
 pragma solidity ^0.4.24;
 import "./BrightCoinTokenOwner.sol";
 import "./SafeMath.sol";
+import "./BrightCoinTokenConfig.sol";
 
 //Section1
 //...............................................................................
-contract TokenPreSaleDetails is BrightCoinTokenOwner
+contract TokenPreSaleDetails is BrightCoinTokenOwner, BrightCoinTokenConfig
 {
 
     //address owner;
@@ -14,53 +15,43 @@ contract TokenPreSaleDetails is BrightCoinTokenOwner
     }
 
   
-   //For Presales Only 
-    uint256  public constant maxCoinSoldDuringPresale = 5000;
-    uint256  public constant BonusAmountPreSale = 0;
-    uint8    public constant Discount = 40; 
-
-
-    //PreSale Start & End Dates 
-    uint256 internal ICOstartDate = 1539835866; //18/10/2018 04:11AM GMT
-    uint256 internal ICOendDate =  1539843066;   //18/10/2018 06:11AM GMT
-
     //Current Presale Status 
     bool public PreSaleOn = true;
  
      //Function for changing the startDate of Presale
-    function changeStartDate(uint256 startDateTimeStamp) onlyTokenOwner public returns(bool){
+    function changeStartDate(uint256 _startDateTimeStamp) public onlyTokenOwner  returns(bool){
 
     require(ICOstartDate > now);
-    require( startDateTimeStamp < ICOendDate );
-    ICOstartDate = startDateTimeStamp;
+    require( _startDateTimeStamp < ICOendDate );
+    ICOstartDate = _startDateTimeStamp;
     return true;
   }
 
-    function getMaxCoinSoldDuringPreSale(uint256 decimal) pure internal  returns(uint256)
+    function getMaxCoinSoldDuringPreSale(uint256 _decimal) pure internal  returns(uint256)
     {
-        uint256 val = maxCoinSoldDuringPresale*(10**uint256(decimal));
+        uint256 val = maxCoinSoldDuringPresale*(10**uint256(_decimal));
         return val;
         
     }
 
     /**
    * @dev It changes end date of Presale , provided it is not crossed.
-   * @param endDateTimeStamp The new proposed end datetime for Presale.
+   * @param _endDateTimeStamp The new proposed end datetime for Presale.
    */
-    function changeEndDate(uint256 endDateTimeStamp) onlyTokenOwner public returns(bool) 
+    function changeEndDate(uint256 _endDateTimeStamp) public onlyTokenOwner  returns(bool) 
     {
       require(ICOendDate > now);
-      require( endDateTimeStamp > ICOstartDate );
-      ICOendDate = endDateTimeStamp;
+      require( _endDateTimeStamp > ICOstartDate );
+      ICOendDate = _endDateTimeStamp;
       return true;
     }
     
     /**
    * @dev It check whether the datetime passed is in presale period or not
-   * @param currenttime The datetime to be checked for presale period.
+   * @param _currenttime The datetime to be checked for presale period.
    */
-     function inPreSalePeriod(uint256 currenttime) public view returns (bool) {
-      if (currenttime >= ICOstartDate && currenttime < ICOendDate) 
+     function inPreSalePeriod(uint256 _currenttime) public view returns (bool) {
+      if (_currenttime >= ICOstartDate && _currenttime < ICOendDate) 
           return true;
       else 
           return false;     
@@ -68,11 +59,11 @@ contract TokenPreSaleDetails is BrightCoinTokenOwner
 
     /**
    * @dev It will change the presale status or true/false depending upon input
-   * @param presalestatus the staus to be set with presale.
+   * @param _presalestatus the staus to be set with presale.
    */
-     function changePresaleStatus(bool presalestatus) onlyTokenOwner public
+     function changePresaleStatus(bool _presalestatus) public onlyTokenOwner 
      {
-       PreSaleOn = presalestatus;
+       PreSaleOn = _presalestatus;
      }
 }
 
@@ -81,14 +72,14 @@ contract TokenPreSaleDetails is BrightCoinTokenOwner
 contract TokenMainSaleDetails  is BrightCoinTokenOwner
 {
    //For MainSale
-struct MainSaleTokenDistrubution
+struct mainSaleTokenDistrubution
 {
     uint256 mainStartDate;
     uint256 mainSaleEndDate ;
     uint256 maxCoinSold;
     uint256 discount;
     bool    periodActive;
-    uint256   periodIndex;
+    uint8  periodIndex;
     bool exists;
 }
 
@@ -100,51 +91,51 @@ constructor() public
  
 }
 
-mapping(uint256 => MainSaleTokenDistrubution) MainSaleCountMapping;
+mapping(uint256 => mainSaleTokenDistrubution) mainSaleCountMapping;
 uint256[] internal  mainSaleToken;
 
  /**
    * @dev It add mainsale period details 
-   * @param mainStartDate Start date of curent mainsale period
-   * @param mainSaleEndDate End Date of MainSale
-   * @param MaxCoinSold Maximum coin sold during this period
-   * @param discount Bonus if any for this sale period
-   * @param PeriodIndex Period Index so that MainSale period can be tracked.
-   * @param PeriodActive  Setting current period state.
+   * @param _mainStartDate Start date of curent mainsale period
+   * @param _mainSaleEndDate End Date of MainSale
+   * @param _maxCoinSold Maximum coin sold during this period
+   * @param _discount Bonus if any for this sale period
+   * @param _periodIndex Period Index so that MainSale period can be tracked.
+   * @param _periodActive  Setting current period state.
    */
-function AddMainSalePeriod(uint256 mainStartDate,uint256 mainSaleEndDate,uint256 MaxCoinSold,
-                        uint256 discount,uint256 PeriodIndex,
-                         bool PeriodActive) onlyTokenOwner public   returns(bool)
+function AddMainSalePeriod(uint256 _mainStartDate,uint256 _mainSaleEndDate,uint256 _maxCoinSold,
+                        uint256 _discount,uint8 _periodIndex,
+                         bool _periodActive) public onlyTokenOwner  returns(bool)
    {
 
-      MainSaleTokenDistrubution storage mainSale = MainSaleCountMapping[PeriodIndex];
+      mainSaleTokenDistrubution storage mainSale = mainSaleCountMapping[_periodIndex];
       require(mainSale.exists == false); //To ensure that it is  new instance
       
-      mainSale.mainStartDate  = mainStartDate;
-      mainSale.mainSaleEndDate = mainSaleEndDate;
-      mainSale.maxCoinSold = MaxCoinSold;
-      mainSale.discount = discount;
-      mainSale.periodIndex = PeriodIndex; 
-      mainSale.periodActive = PeriodActive;
+      mainSale.mainStartDate  = _mainStartDate;
+      mainSale.mainSaleEndDate = _mainSaleEndDate;
+      mainSale.maxCoinSold = _maxCoinSold;
+      mainSale.discount = _discount;
+      mainSale.periodIndex = _periodIndex; 
+      mainSale.periodActive = _periodActive;
       mainSale.exists = true;
 
-      mainSaleToken.push(PeriodIndex);
+      mainSaleToken.push(_periodIndex);
       return true;
     }                                                      
                             
 
    /**
    * @dev It check whenther current datetime fits is given mainsale period
-   * @param DateTimeStamp to be verified.
-   * @param PeriodIndex mainSale period Index
+   * @param _dateTimeStamp to be verified.
+   * @param _periodIndex mainSale period Index
    */
- function CheckTokenPeriodSale(uint256 DateTimeStamp, uint8 PeriodIndex) onlyTokenOwner public view returns(bool) {
+ function CheckTokenPeriodSale(uint256 _dateTimeStamp, uint8 _periodIndex) public onlyTokenOwner  view returns(bool) {
 
-        MainSaleTokenDistrubution storage MainSaleTokenSale = MainSaleCountMapping[PeriodIndex];
-       require(MainSaleTokenSale.mainStartDate !=0);
-        require(MainSaleTokenSale.mainSaleEndDate !=0);
+        mainSaleTokenDistrubution storage mainSaleTokenSale = mainSaleCountMapping[_periodIndex];
+       require(mainSaleTokenSale.mainStartDate !=0);
+        require(mainSaleTokenSale.mainSaleEndDate !=0);
 
-        if( (MainSaleTokenSale.mainStartDate < DateTimeStamp) && (MainSaleTokenSale.mainSaleEndDate > DateTimeStamp) )
+        if( (mainSaleTokenSale.mainStartDate < _dateTimeStamp) && (mainSaleTokenSale.mainSaleEndDate > _dateTimeStamp) )
         return true;
 
         return false;
@@ -153,23 +144,23 @@ function AddMainSalePeriod(uint256 mainStartDate,uint256 mainSaleEndDate,uint256
 
   /**
    * @dev It check bonus details for given mainSale Period 
-   * @param PeriodIndex period to be verfied.
+   * @param _periodIndex period to be verfied.
    */
- function getMainSaleDiscount(uint256 PeriodIndex)  internal view returns(uint256) {
+ function getMainSaleDiscount(uint8 _periodIndex)  internal view returns(uint256) {
 
-        MainSaleTokenDistrubution storage MainSaleToken = MainSaleCountMapping[PeriodIndex];
-        return MainSaleToken.discount;
+        mainSaleTokenDistrubution storage mainSaleToken = mainSaleCountMapping[_periodIndex];
+        return mainSaleToken.discount;
   }
 
    /**
    * @dev It ends mainSale for s given period 
-   * @param PeriodIndex period to be End.
+   * @param _periodIndex period to be End.
    */
-  function EndMainSale(uint8 PeriodIndex) onlyTokenOwner public
+  function EndMainSale(uint8 _periodIndex) public onlyTokenOwner 
   {
 
-  MainSaleTokenDistrubution storage MainSaleTokenSale = MainSaleCountMapping[PeriodIndex];
-  MainSaleTokenSale.periodActive = false;
+  mainSaleTokenDistrubution storage mainSaleTokenSale = mainSaleCountMapping[_periodIndex];
+  mainSaleTokenSale.periodActive = false;
 
   //Whether we need to give refund instantly  , to be managed by Application not Samrt contract
 
@@ -177,12 +168,12 @@ function AddMainSalePeriod(uint256 mainStartDate,uint256 mainSaleEndDate,uint256
 
   /**
    * @dev Check if mainSale is On  for a particular period
-   * @param PeriodIndex period to be verfied.
+   * @param _periodIndex period to be verfied.
    */
- function CheckIfMainSaleOn(uint256 PeriodIndex)  public view returns(bool) {
+ function CheckIfMainSaleOn(uint8 _periodIndex)  public view returns(bool) {
 
-        MainSaleTokenDistrubution storage MainSaleTokenSale = MainSaleCountMapping[PeriodIndex];
-        return(MainSaleTokenSale.periodActive);
+        mainSaleTokenDistrubution storage mainSaleTokenSale = mainSaleCountMapping[_periodIndex];
+        return(mainSaleTokenSale.periodActive);
         
   }
 
@@ -197,17 +188,17 @@ function AddMainSalePeriod(uint256 mainStartDate,uint256 mainSaleEndDate,uint256
 
   /**
    * @dev Check limit of main sale for a particular 
-   * @param periodIndex period to be verfied.
-   * @param  tokenamount to be compared with maximit
-   * @param  decimalValue this value to multipled with value so that compare uint become same
+   * @param _periodIndex period to be verfied.
+   * @param  _tokenamount to be compared with maximit
+   * @param  _decimalValue this value to multipled with value so that compare uint become same
    */
-  function CheckMainSaleLimit( uint256 periodIndex, uint256 tokenamount,uint256 decimalValue) view public returns(bool)
+  function CheckMainSaleLimit( uint8 _periodIndex, uint256 _tokenamount,uint256 _decimalValue) view public returns(bool)
   {
 
-    MainSaleTokenDistrubution storage MainSaleTokenSale = MainSaleCountMapping[periodIndex];
+    mainSaleTokenDistrubution storage mainSaleTokenSale = mainSaleCountMapping[_periodIndex];
 
-    uint256 maxCoinSoldDecimal = (MainSaleTokenSale.maxCoinSold).mul(10**uint256(decimalValue));
-    if(tokenamount <= maxCoinSoldDecimal )
+    uint256 maxCoinSoldDecimal = (mainSaleTokenSale.maxCoinSold).mul(10**uint256(_decimalValue));
+    if(_tokenamount <= maxCoinSoldDecimal )
       return true;
 
       return false;
@@ -216,34 +207,35 @@ function AddMainSalePeriod(uint256 mainStartDate,uint256 mainSaleEndDate,uint256
 
 /**
    * @dev it changes the limit of max token that can be sold in this period
-   * @param periodIndex period to be verfied.
+   * @param _periodIndex period to be verfied.
+   * @param _maxTokenTobeSold  maximum token to be sold
    */
-  function changeMainSaleLimit( uint8 periodIndex, uint256 maxTokenTobeSold)  onlyTokenOwner public 
+  function changeMainSaleLimit( uint8 _periodIndex, uint256 _maxTokenTobeSold) public onlyTokenOwner  
   {
 
-  MainSaleTokenDistrubution storage MainSaleTokenSale = MainSaleCountMapping[periodIndex];
-  MainSaleTokenSale.maxCoinSold = maxTokenTobeSold;
+  mainSaleTokenDistrubution storage mainSaleTokenSale = mainSaleCountMapping[_periodIndex];
+  mainSaleTokenSale.maxCoinSold = _maxTokenTobeSold;
 
   }
 
   /**
    * @dev it changes the limit of max token that can be sold in this period
-   * @param currenttime check current time for mainSale
+   * @param _currenttime check current time for mainSale
    */
-  function checkMainSalePeriod( uint256 currenttime) view internal returns(uint256)
+  function checkMainSalePeriod( uint256 _currenttime) view internal returns(uint256)
   {
 
   if(mainSaleToken.length  == 0)
     return 0;
   //get first MainSale period Index
-  uint256 periodindex;
+  uint8 periodindex;
   for(periodindex = 0; periodindex <=mainSaleToken.length; periodindex++)
   {
-  MainSaleTokenDistrubution storage MainSaleTokenSale = MainSaleCountMapping[periodindex];
-  if( (MainSaleTokenSale.mainStartDate <= currenttime) && 
-                      (currenttime <=MainSaleTokenSale.mainSaleEndDate) )
+  mainSaleTokenDistrubution storage mainSaleTokenSale = mainSaleCountMapping[periodindex];
+  if( (mainSaleTokenSale.mainStartDate <= _currenttime) && 
+                      (_currenttime <=mainSaleTokenSale.mainSaleEndDate) )
   {
-       return MainSaleTokenSale.periodIndex;
+       return mainSaleTokenSale.periodIndex;
   }
 
   }

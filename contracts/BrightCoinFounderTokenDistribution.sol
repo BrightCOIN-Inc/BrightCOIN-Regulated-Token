@@ -9,16 +9,16 @@ contract BrightCoinFounderTokenDistribution  is BrightCoinTokenOwner
   mapping(address => uint256)FounderBalances;
 using SafeMath for uint;
 
- struct FounderDistribution {
-       address FounderAddress;
-       uint256 FounderToken;
-       uint256 LockExpiryTime;
-       bool    FounderActive;
-       bool    Tokenlocked;
+ struct founderDistribution {
+       address founderAddress;
+       uint256 founderToken;
+       uint256 lockExpiryTime;
+       bool    founderActive;
+       bool    tokenlocked;
     }
     
- mapping(address => FounderDistribution) FounderTokenDetails;
- address[] internal FounderAddrs;
+ mapping(address => founderDistribution) founderTokenDetails;
+ address[] internal founderAddrs;
 
 constructor() public
 {
@@ -27,37 +27,37 @@ constructor() public
 
 //Add Founder Starts
 
-function AddFounder(address newFounder,uint256 FounderToken,uint256 LockExpiryDateTime,
- bool tokenLocked)   internal 
+function AddFounder(address _newFounder,uint256 _founderToken,uint256 _lockExpiryDateTime,
+ bool _tokenLocked)   internal 
   {
 
-      FounderDistribution storage  FounderDetails = FounderTokenDetails[newFounder];
+      founderDistribution storage  founderDetails = founderTokenDetails[_newFounder];
     
-      FounderDetails.FounderAddress = newFounder;
-      FounderDetails.FounderToken = FounderToken;
-      FounderDetails.LockExpiryTime = LockExpiryDateTime;
-      FounderDetails.Tokenlocked = tokenLocked;
-      FounderDetails.FounderActive = true;
-      FounderAddrs.push(newFounder);
+      founderDetails.founderAddress = _newFounder;
+      founderDetails.founderToken = _founderToken;
+      founderDetails.lockExpiryTime = _lockExpiryDateTime;
+      founderDetails.tokenlocked = _tokenLocked;
+      founderDetails.founderActive = true;
+      founderAddrs.push(_newFounder);
     
  }
 
 
-  function  UpdateFounderTokenDetails(address newFounder,uint256 FounderToken,
-  uint256 LockExpiryDateTime) internal
+  function  UpdateFounderTokenDetails(address _newFounder,uint256 _founderToken,
+  uint256 _lockExpiryDateTime) internal
   {
-    require(CheckIfFounderActive(newFounder) == true);   
+    require(CheckIfFounderActive(_newFounder) == true);   
      //Add new Token amount and Set new locking Period
-      FounderDistribution storage  FounderDetails = FounderTokenDetails[newFounder];
-     FounderDetails.FounderToken  = FounderDetails.FounderToken.add(FounderToken);
-     FounderDetails.LockExpiryTime = LockExpiryDateTime;     
+      founderDistribution storage  founderDetails = founderTokenDetails[_newFounder];
+     founderDetails.founderToken  = founderDetails.founderToken.add(_founderToken);
+     founderDetails.lockExpiryTime = _lockExpiryDateTime;     
   }
 
 //Remove Founder For Further Investment and from the Team
- function RemoveFounderFromFurtherInvestment(address NewFounderAddr)  onlyTokenOwner public returns(bool)
+ function RemoveFounderFromFurtherInvestment(address _newFounderAddr)  public onlyTokenOwner  returns(bool)
  {
-   FounderDistribution storage newFounderDetails = FounderTokenDetails[NewFounderAddr];
-   newFounderDetails.FounderActive = false;
+   founderDistribution storage newFounderDetails = founderTokenDetails[_newFounderAddr];
+   newFounderDetails.founderActive = false;
     
     return true;
 
@@ -66,11 +66,11 @@ function AddFounder(address newFounder,uint256 FounderToken,uint256 LockExpiryDa
 //ENDS
 
 //check if Founder Removed 
- function CheckIfFounderActive(address NewFounderAddr) view internal returns(bool)
+ function CheckIfFounderActive(address _newFounderAddr) view internal returns(bool)
  {
 
-  FounderDistribution storage founderDetails = FounderTokenDetails[NewFounderAddr];
- if(founderDetails.FounderActive == true)
+  founderDistribution storage founderDetails = founderTokenDetails[_newFounderAddr];
+ if(founderDetails.founderActive == true)
   {
       return true;
   }
@@ -84,17 +84,17 @@ function AddFounder(address newFounder,uint256 FounderToken,uint256 LockExpiryDa
 //Count total no of Advisors
  function TotalFounder() public view returns(uint256) 
  {
-   return FounderAddrs.length;
+   return founderAddrs.length;
   
  }
 
 
  //check Amount with Advisor
- function CheckFounderTokenAmount(address NewFounderAddr) view public returns(uint256)
+ function CheckFounderTokenAmount(address _newFounderAddr) view public returns(uint256)
  {
 
-  FounderDistribution storage FounderDetails = FounderTokenDetails[NewFounderAddr];
-  return FounderDetails.FounderToken;
+  founderDistribution storage founderDetails = founderTokenDetails[_newFounderAddr];
+  return founderDetails.founderToken;
    
  }
 

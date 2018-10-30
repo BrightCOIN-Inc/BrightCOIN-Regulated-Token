@@ -16,58 +16,55 @@ constructor() public
 
 }
   //There might be multiple entry to this
- uint256 internal constant InitialAllocatedAdvisorToken = 5000;
  uint256 public TotalAllocatedAdvisorToken;
  
  
-
-  // AddAdvisor(ddr,token,expiryDateTime,tokenlocked);
- struct AdvisorDistribution {
+ struct advisorDistribution {
         address addr;
         uint256 tokenamount;
         uint256 expiryDateTime;
-        bool   AdvisorpartofTeam;
+        bool   advisorpartofTeam;
         bool  tokenlocked;
     }
- mapping(address => AdvisorDistribution) AdvisorDistributionDetails;
- address[] public AdvisorDistributionAddr;
+ mapping(address => advisorDistribution) advisorDistributionDetails;
+ address[] public advisorDistributionAddr;
  
  
  //Advisor Starts
 //Adding New Advisor for Token Distribution
- function AddAdvisor(address NewAdvisor,uint256 Tokenamount,uint256 lockexpiryTime,bool tokenlocked)   internal
+ function AddAdvisor(address _newAdvisor,uint256 _tokenamount,uint256 _lockexpiryTime,bool _tokenlocked)   internal
   {
     
-        AdvisorDistribution storage  AdvisorDetails = AdvisorDistributionDetails[NewAdvisor];
+        advisorDistribution storage  advisorDetails = advisorDistributionDetails[_newAdvisor];
 
-       AdvisorDetails.addr = NewAdvisor;
-       AdvisorDetails.tokenamount = Tokenamount;
-       AdvisorDetails.expiryDateTime = lockexpiryTime;
-       AdvisorDetails.AdvisorpartofTeam = true;
-       AdvisorDetails.tokenlocked   = tokenlocked;
-    
-        AdvisorDistributionAddr.push(NewAdvisor);
+       advisorDetails.addr = _newAdvisor;
+       advisorDetails.tokenamount = _tokenamount;
+       advisorDetails.expiryDateTime = _lockexpiryTime;
+       advisorDetails.advisorpartofTeam = true;
+       advisorDetails.tokenlocked   = _tokenlocked;
+
+       advisorDistributionAddr.push(_newAdvisor);
  
  }
 
-function UpdateAdvisorTokenDetails (address NewAdvisor,uint256 Tokenamount,
-  uint256 LockExpiryDateTime) internal
+function UpdateAdvisorTokenDetails (address _newAdvisor,uint256 _tokenamount,
+  uint256 _lockExpiryDateTime) internal
 {
- require(CheckIfAdvisorActive(NewAdvisor) == true);
-  AdvisorDistribution storage  AdvisorDetails = AdvisorDistributionDetails[NewAdvisor];
+ require(CheckIfAdvisorActive(_newAdvisor) == true);
+  advisorDistribution storage  advisorDetails = advisorDistributionDetails[_newAdvisor];
                   
    //Add new Token amount and Set new locking Period
-   AdvisorDetails.tokenamount  = AdvisorDetails.tokenamount.add(Tokenamount);
-   AdvisorDetails.expiryDateTime = LockExpiryDateTime;
+   advisorDetails.tokenamount  = advisorDetails.tokenamount.add(_tokenamount);
+   advisorDetails.expiryDateTime = _lockExpiryDateTime;
 
         
 }
 
  //Remove Advisor For Further Investment and from the Team
- function RemoveAdvisorFromFurtherInvestment(address NewAdvisorAddr) onlyTokenOwner public returns(bool)
+ function RemoveAdvisorFromFurtherInvestment(address _newAdvisorAddr) public onlyTokenOwner  returns(bool)
  {
-    AdvisorDistribution storage newAdvisorDetails = AdvisorDistributionDetails[NewAdvisorAddr];
-    newAdvisorDetails.AdvisorpartofTeam = false;
+    advisorDistribution storage newAdvisorDetails = advisorDistributionDetails[_newAdvisorAddr];
+    newAdvisorDetails.advisorpartofTeam = false;
     return true;
  }
 
@@ -75,11 +72,11 @@ function UpdateAdvisorTokenDetails (address NewAdvisor,uint256 Tokenamount,
 
 
  //check if Advisor Removed 
- function CheckIfAdvisorActive(address NewAdvisorAddr) view internal returns(bool)
+ function CheckIfAdvisorActive(address _newAdvisorAddr) view internal returns(bool)
  {
 
-  AdvisorDistribution storage AdvisorDetails = AdvisorDistributionDetails[NewAdvisorAddr];
-  if(AdvisorDetails.AdvisorpartofTeam == true)
+  advisorDistribution storage advisorDetails = advisorDistributionDetails[_newAdvisorAddr];
+  if(advisorDetails.advisorpartofTeam == true)
   {
       return true;
   }
@@ -88,18 +85,18 @@ function UpdateAdvisorTokenDetails (address NewAdvisor,uint256 Tokenamount,
  }
 
 //Count total no of Advisors
- function TotalAdvisor() onlyTokenOwner public view returns(uint256) 
+ function TotalAdvisor() public onlyTokenOwner  view returns(uint256) 
  {
-   return AdvisorDistributionAddr.length;
+   return advisorDistributionAddr.length;
  }
 
 
  //check Amount with Advisor
- function CheckAdvisorTokenAmount(address NewAdvisorAddr) onlyTokenOwner public view returns(uint256)
+ function CheckAdvisorTokenAmount(address _newAdvisorAddr) public onlyTokenOwner  view returns(uint256)
  {
 
-  AdvisorDistribution storage AdvisorDetails = AdvisorDistributionDetails[NewAdvisorAddr];
-  return AdvisorDetails.tokenamount ;
+  advisorDistribution storage advisorDetails = advisorDistributionDetails[_newAdvisorAddr];
+  return advisorDetails.tokenamount ;
 
  }
 

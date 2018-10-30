@@ -14,84 +14,80 @@ contract  BrightCoinAccreditionInvestor is BrightCoinTokenOwner
 {
 
 using SafeMath for uint;
-uint256 public  TotalInvestmentCurrently; 
-uint256 public constant USAGeoLocation = 1;
-
 
 constructor() public
 {
   
 }
 
-struct AccreditedInvestor
+struct accreditedInvestor
 {
-    address Investor;
-    bool    AccreditionStatus;
-    uint256 AccreditionExpiryDateTime;
-    uint256 InvestorGeoLocation;  //Must be USA Citizen Only in Case of RegDRegS Investment
+    address investor;
+    bool    accreditionStatus;
+    uint256 accreditionExpiryDateTime;
+    uint256 investorGeoLocation;  //Must be USA Citizen Only in Case of RegDRegS Investment
     string ipfsHashRegDInvestor; //It must contains the details of Investor
        
 }
 
-     mapping(address => AccreditedInvestor) AccreditedInvestorDetails;
+     mapping(address => accreditedInvestor) accreditedInvestorDetails;
      address[] public accreditedInvestors;
 
      /* Function to Add Investor details*/
-     function  AddInvestorAccreditionDetails(address Investoraddr,
-                                            bool AccreditionStatus,
-                                            uint256 AccreditionExpiryDateTime,
-                                            uint256 InvestorGeoLocation, 
-                                            string ipfsHashRegDInvestor )
-                                            onlyTokenOwner public
+     function  AddInvestorAccreditionDetails(address _investoraddr,
+                                            bool _accreditionStatus,
+                                            uint256 _accreditionExpiryDateTime,
+                                            uint256 _investorGeoLocation, 
+                                            string _ipfsHashRegDInvestor )
+                                            public onlyTokenOwner 
       {
       
-      require(Investoraddr != 0x0);
-      require(AccreditionExpiryDateTime > 0);
+      require(_investoraddr != 0x0);
+      require(_accreditionExpiryDateTime > 0);
 
-       AccreditedInvestor storage Investment = AccreditedInvestorDetails[Investoraddr];
+       accreditedInvestor storage investment = accreditedInvestorDetails[_investoraddr];
 
-       Investment.Investor = Investoraddr;
-       Investment.AccreditionStatus = AccreditionStatus;
-       Investment.AccreditionExpiryDateTime = AccreditionExpiryDateTime;
-       Investment.InvestorGeoLocation = InvestorGeoLocation;
-       Investment.ipfsHashRegDInvestor = ipfsHashRegDInvestor;
-
-       accreditedInvestors.push(Investoraddr);
+       investment.investor = _investoraddr;
+       investment.accreditionStatus = _accreditionStatus;
+       investment.accreditionExpiryDateTime = _accreditionExpiryDateTime;
+       investment.investorGeoLocation = _investorGeoLocation;
+       investment.ipfsHashRegDInvestor = _ipfsHashRegDInvestor;
+       accreditedInvestors.push(_investoraddr);
 }
 
 
 
 
- function GetGeoLocationAccreditedInvestor(address AccreditedInvestoraddr )
+ function GetGeoLocationAccreditedInvestor(address _accreditedInvestoraddr )
                                 view  public returns(uint256)
  {
-      AccreditedInvestor storage structAccredited =  AccreditedInvestorDetails[AccreditedInvestoraddr];
-      require(structAccredited.InvestorGeoLocation !=0, "Geolocation Should not be zero");
-      return structAccredited.InvestorGeoLocation;
+      accreditedInvestor storage structAccredited =  accreditedInvestorDetails[_accreditedInvestoraddr];
+      require(structAccredited.investorGeoLocation !=0, "Geolocation Should not be zero");
+      return structAccredited.investorGeoLocation;
  }
 
-function SetAccreditionStatus(address investorAddress,
-                                    bool status)
-                                    onlyTokenOwner public
+function SetAccreditionStatus(address _investorAddress,
+                                    bool _status)
+                                    public onlyTokenOwner 
 {
-    require(investorAddress != 0);
-    AccreditedInvestor storage structAccredited =  AccreditedInvestorDetails[investorAddress];
-    structAccredited.AccreditionStatus = status;
+    require(_investorAddress != 0);
+    accreditedInvestor storage structAccredited =  accreditedInvestorDetails[_investorAddress];
+    structAccredited.accreditionStatus = _status;
 }
 
- function CheckAccreditionStatus( address AccreditedInvestoraddr)  view  public 
+ function CheckAccreditionStatus( address _accreditedInvestoraddr)  view  public 
  returns(bool)
  {
-   AccreditedInvestor storage structAccredited =  AccreditedInvestorDetails[AccreditedInvestoraddr];
-   return structAccredited.AccreditionStatus;
+   accreditedInvestor storage structAccredited =  accreditedInvestorDetails[_accreditedInvestoraddr];
+   return structAccredited.accreditionStatus;
  
  }
 
-  function SetAccreditionExpiryDateTime(address AccreditedInvestoraddr, uint256 expiryDateTime)  onlyTokenOwner public
+  function SetAccreditionExpiryDateTime(address _accreditedInvestoraddr, uint256 _expiryDateTime)  onlyTokenOwner public
   {
-      require(AccreditedInvestoraddr != 0);
-      AccreditedInvestor storage structAccredited =  AccreditedInvestorDetails[AccreditedInvestoraddr];
-      structAccredited.AccreditionExpiryDateTime = expiryDateTime;
+      require(_accreditedInvestoraddr != 0);
+      accreditedInvestor storage structAccredited =  accreditedInvestorDetails[_accreditedInvestoraddr];
+      structAccredited.accreditionExpiryDateTime = _expiryDateTime;
   }
 
 

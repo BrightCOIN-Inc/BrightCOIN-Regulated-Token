@@ -11,6 +11,7 @@ import "./BrightCoinInvestorTokenLock.sol";
 
 
 
+
 contract BrightCoinERC20 is TokenPreSaleDetails,
                             TokenMainSaleDetails,
                            BrightCoinAdminTokenDistributionDetails,
@@ -32,30 +33,17 @@ contract BrightCoinERC20 is TokenPreSaleDetails,
   event Burn(address addr, uint256 tokens);
   event Mint(address target, uint256 mintedAmount);
   
- //Token Details  
-  string public constant symbol = "XBR"; // This is token symbol
-  string public constant name = "BrightCOIN"; // this is token name
-  uint256 public constant decimals = 18; // decimal digit for token price calculation
-  string public constant version = "1.0";
-  uint8 public constant ICOType = 2;   //0 for RegD , 1 for RegS and 2 for RedDRegS and 3 means utility ICO
-  bool  internal pauseICO = false; 
-  uint256 internal saleIndex = 0; //Default Sale Index as zero
  
-  
-  enum BrightCoinICOType { RegD, RegS, RegDRegS, Utility }
+  bool  internal pauseICO = false; 
+  uint8 internal saleIndex = 0; //Default Sale Index as zero
 
 //Token Supply Details
-  uint256 public constant initialSupply = 30000;
   uint256 public totalSupply; //Need to set at constructor level
   uint256 private  BountyDistriuted = 0;
   
-  //Presale Maximum and Minmum Contributions
-    uint256  internal MinimumContribution = 0.05 ether;
-    uint256  internal MaximumContribution = 0.3 ether;
+ 
 
   //Purchase Rate
-  //purchase rate can be changed by the Owner
-  uint256 public purchaseRate = 5000;  //5000 token per Ether
   function setPurchaseRate(uint newRate) public onlyTokenOwner {
         require(purchaseRate != newRate);
         purchaseRate = newRate;
@@ -65,41 +53,39 @@ contract BrightCoinERC20 is TokenPreSaleDetails,
  /*
     Soft cap is the minimal amount required by your project, to make it viable, in order to continue. If you do not reach that amount during your ICO then you should allow your investors to refund their money using a push/ pull mechanism.
  */
-  uint internal ICOSoftlimit = 5000; //Minimum Eather to Reach
-  uint internal ICOHardlimit = 30000;
+ 
 
-
-  function ChangeSoftCap(uint newSoflimit) public onlyTokenOwner {
-        require(ICOSoftlimit != newSoflimit);
-        require(newSoflimit < totalSupply);
-        ICOSoftlimit = newSoflimit;
+  function ChangeSoftCap(uint _newSoftcap) public onlyTokenOwner {
+        require(icoSoftcap != _newSoftcap);
+        require(_newSoftcap <= totalSupply);
+        icoSoftcap = _newSoftcap;
       
     }
-    function ChangeHardLimtit(uint256 newHardlimit) public onlyTokenOwner {
+    function changeHardCapLimit(uint256 _newHardcap) public onlyTokenOwner {
        
-        require(ICOHardlimit != newHardlimit);
-        require(newHardlimit < totalSupply);
-        ICOHardlimit = newHardlimit;
+        require(icoHardcap != _newHardcap);
+        require(_newHardcap <= totalSupply);
+        icoHardcap = _newHardcap;
       
     }
 
-    function GetSoftLimit() onlyTokenOwner view public  returns(uint256) {
+    function GetSoftcap() public  view   returns(uint256) {
 
-      return ICOSoftlimit;
+      return icoSoftcap;
     }
 
-     function GetHardLimit()  onlyTokenOwner view public returns(uint256) {
+     function GetHardcap() public   view  returns(uint256) {
 
-      return ICOHardlimit;
+      return icoHardcap;
     }
 
     //Check if softcap reached
-    function CheckIfSoftlimitReached() onlyTokenOwner   internal  view returns(bool)
+    function CheckIfSoftcapAchived() public   view returns(bool)
     {
 
       uint tokenSold = totalSupply.sub(balances[owner()]);
 
-        if(tokenSold > ICOSoftlimit)
+        if(tokenSold > icoSoftcap)
           return true;
           else 
           return false;  
@@ -107,40 +93,41 @@ contract BrightCoinERC20 is TokenPreSaleDetails,
     }
 
     //check if HARD Cap Achived
-    function CheckIfHardlimitAchived(uint256 tokens)  internal view returns(bool)
+    function CheckIfHardcapAchived(uint256 _tokens)  public view returns(bool)
     {
       uint tokenSold = totalSupply.sub(balances[owner()]);
-      require(tokenSold <= ICOHardlimit);
-      require(tokenSold.add(tokens) <=ICOHardlimit);
+      require(tokenSold <= icoHardcap);
+      require(tokenSold.add(_tokens) <=icoHardcap);
       return true;
 
     }
  
-    function setSalePeriodIndex(uint256 index) onlyTokenOwner public 
+    function setSalePeriodIndex(uint8 _index) public onlyTokenOwner  
     {
-        saleIndex = index;
+        require(_index >0); //To set minimum Sale Period Index
+        saleIndex = _index;
         
     }
     
-     function getSalePeriodIndex()  public view  returns(uint256)
+     function getSalePeriodIndex()  public view  returns(uint8)
     {
         return saleIndex;
         
     }
   
-  //Investment storage address
-  address public FundDepositAddress = 0x347a4442d3325a06b46c8860e168df440c2ad881; //Should be taken from Script 
-  function ChangeFundDepositAddress(address NewFundDepositAddress) onlyTokenOwner public {
-    require( FundDepositAddress != NewFundDepositAddress );
-    FundDepositAddress = NewFundDepositAddress;
+  
+  function ChangeFundDepositAddress(address _newFundDepositAddress) public onlyTokenOwner  {
+    require(_newFundDepositAddress != address(0x0));
+    require( FundDepositAddress != _newFundDepositAddress );
+    FundDepositAddress = _newFundDepositAddress;
   }
   
 
 //option for Minting more token 
 bool public MintMoreTokens  = false;
-function UpdateTokenMintingOption(bool mintingOption) onlyTokenOwner public {
+function UpdateTokenMintingOption(bool _mintingOption) public onlyTokenOwner  {
   
-  MintMoreTokens = mintingOption;
+  MintMoreTokens = _mintingOption;
 }
 
 
@@ -160,17 +147,18 @@ function UpdateTokenMintingOption(bool mintingOption) onlyTokenOwner public {
 
    totalSupply = initialSupply*(10**uint256(decimals));
 
-  TotalAllocatedTeamToken = InitialAllocatedTeamToken*(10**uint256(decimals));
- TotalAllocatedFounder = InitialFounderToken*(10**uint256(decimals));
+   TotalAllocatedTeamToken = InitialAllocatedTeamToken*(10**uint256(decimals));
+   TotalAllocatedFounder = InitialFounderToken*(10**uint256(decimals));
    TotalAllocatedAdvisorToken = InitialAllocatedAdvisorToken*(10**uint256(decimals));
    CompanyHoldingValue = InitialCompanyHoldingValue*(10**uint256(decimals));
    BountyAllocated = totalBountyAllocated*(10**uint256(decimals));
    
 
-   ICOHardlimit = ICOHardlimit.mul(10**uint256(decimals));
-   ICOSoftlimit = ICOSoftlimit.mul(10**uint256(decimals));
+   icoHardcap = icoHardcap.mul(10**uint256(decimals));
+   icoSoftcap = icoSoftcap.mul(10**uint256(decimals));
    
    balances[msg.sender] = totalSupply;
+  emit Transfer(address(0), msg.sender, totalSupply);
    
   FounderBalances[msg.sender] = TotalAllocatedFounder;
   AdvisorBalances[msg.sender] = TotalAllocatedAdvisorToken;
@@ -187,8 +175,8 @@ function UpdateTokenMintingOption(bool mintingOption) onlyTokenOwner public {
  
 
  // This function returns remaininig token
-  function balanceOf(address who) public constant returns (uint256) {
-      return balances[who];
+  function balanceOf(address _who) public constant returns (uint256) {
+      return balances[_who];
   }
 
 //Function Total Supply
@@ -215,19 +203,19 @@ function totalSupply() public constant returns (uint256) {
     
    
     /// @notice Will Transfer tokens from current address to receipient address.
-    /// @param to  addresses to send token.
-    /// @param tokens amount of token to be transferred.
-    function internaltransfer(address to, uint256 tokens) internal returns (bool) {
+    /// @param _to  addresses to send token.
+    /// @param _tokens amount of token to be transferred.
+    function internaltransfer(address _to, uint256 _tokens) internal returns (bool) {
   
      // Prevent transfer to 0x0 address. 
-    require(to != 0x0);
-    require (tokens > 0);
-   require (msg.sender != to);
-   require(balances[msg.sender] >= tokens);
-   require(balances[to] + tokens > balances[to]);
-    balances[msg.sender] = balances[msg.sender].sub(tokens);
-    balances[to] = balances[to].add(tokens);
-    emit Transfer(msg.sender, to, tokens);
+    require(_to != 0x0);
+    require (_tokens > 0);
+   require (msg.sender != _to);
+   require(balances[msg.sender] >= _tokens);
+   require(balances[_to] + _tokens > balances[_to]);
+    balances[msg.sender] = balances[msg.sender].sub(_tokens);
+    balances[_to] = balances[_to].add(_tokens);
+    emit Transfer(msg.sender, _to, _tokens);
     
     return true;
    }
@@ -237,15 +225,16 @@ function totalSupply() public constant returns (uint256) {
     /// @notice Will cause a certain `_value` of coins minted for `_to`.
     /// @param _to The address that will receive the coin.
     /// @param _value The amount of coin they will receive.
-    function mint(address _to, uint _value) onlyTokenOwner public {
+    function mint(address _to, uint _value) public onlyTokenOwner  {
        // assuming you have a contract owner
         mintToken(_to, _value);
     }
 
+/*
     /// @notice Will allow multiple minting within a single call to save gas.
     /// @param recipients A list of addresses to mint for.
     /// @param _values The list of values for each respective `_to` address.
-    function airdropMinting(address[] recipients, uint256[] _values) onlyTokenOwner public {
+    function airdropMinting(address[] recipients, uint256[] _values) public onlyTokenOwner  {
         // assuming you have a contract owner
         require(recipients.length == _values.length);
         for (uint i = 0; i < recipients.length; i++) {
@@ -253,6 +242,7 @@ function totalSupply() public constant returns (uint256) {
             mintToken(recipients[i], _values[i]);
         }
     }
+    */
 
     /// Internal method shared by `mint()` and `airdropMinting()`.
     function mintToken(address _to, uint256 _value) internal {
@@ -266,7 +256,7 @@ function totalSupply() public constant returns (uint256) {
 
     /// @notice it will burn all the token passed as parameter.
     /// @param _value Value of token to be burnt
-   function burn(uint256 _value) onlyTokenOwner public {
+   function burn(uint256 _value) public onlyTokenOwner  {
     require(_value > 0);
     require(_value <= balances[msg.sender]);
     // no need to require value <= totalSupply, since that would imply the
@@ -280,39 +270,39 @@ function totalSupply() public constant returns (uint256) {
 
 
    //Owner of ICO can anytime Stop the ICO post that no any transaction will happen
-   function pauseICOtransaction(bool _status) onlyTokenOwner public {
+   function pauseICOtransaction(bool _status) public onlyTokenOwner  {
 
     pauseICO = _status;
    }
 
 //Check if token is available for further Distribution to Admin
- function InterTransferToAdmin(address addr,
-                     uint256 TokenAmount,
-                     uint8 AdminType )   internal  returns(bool)
+ function InterTransferToAdmin(address _addr,
+                     uint256 _tokenAmount,
+                     uint8 _adminType )   internal  returns(bool)
  {
      
 
-     if(AdminType == uint8(BrightCoinAdminType.Founder))
+     if(_adminType == uint8(BrightCoinAdminType.Founder))
     {
-        require(TokenAmount <= FounderBalances[msg.sender]);
-         balances[addr] = balances[addr].add(TokenAmount);
-         FounderBalances[msg.sender] = FounderBalances[msg.sender].sub(TokenAmount);
+        require(_tokenAmount <= FounderBalances[msg.sender]);
+         balances[_addr] = balances[_addr].add(_tokenAmount);
+         FounderBalances[msg.sender] = FounderBalances[msg.sender].sub(_tokenAmount);
         // emit Transfer(msg.sender, addr, TokenAmount);
       return true;
     }
-    else if (AdminType == uint8(BrightCoinAdminType.Advisor))
+    else if (_adminType == uint8(BrightCoinAdminType.Advisor))
     {
-      require(TokenAmount <= AdvisorBalances[msg.sender]);
-      balances[addr] = balances[addr].add(TokenAmount);
-      AdvisorBalances[msg.sender] = AdvisorBalances[msg.sender].sub(TokenAmount);
+      require(_tokenAmount <= AdvisorBalances[msg.sender]);
+      balances[_addr] = balances[_addr].add(_tokenAmount);
+      AdvisorBalances[msg.sender] = AdvisorBalances[msg.sender].sub(_tokenAmount);
      // emit Transfer(msg.sender, addr, TokenAmount);
       return true;
     }
-    else if(AdminType == uint8(BrightCoinAdminType.Team))
+    else if(_adminType == uint8(BrightCoinAdminType.Team))
     {
-      require(TokenAmount <= TeamBalances[msg.sender]);
-      balances[addr] = balances[addr].add(TokenAmount);
-      TeamBalances[msg.sender] = TeamBalances[msg.sender].sub(TokenAmount);
+      require(_tokenAmount <= TeamBalances[msg.sender]);
+      balances[_addr] = balances[_addr].add(_tokenAmount);
+      TeamBalances[msg.sender] = TeamBalances[msg.sender].sub(_tokenAmount);
      // emit Transfer(msg.sender, addr, TokenAmount);
       return true;
 
@@ -321,19 +311,19 @@ function totalSupply() public constant returns (uint256) {
     
  }
     //Check if token is available for further Distribution to Advisor
- function InternalTransferfrom(address _from , address addr, uint256 Tokenamount)  internal returns(bool)
+ function InternalTransferfrom(address _from , address _addr, uint256 _tokenamount)  internal returns(bool)
  {
      
-        require(allowed[owner()][_from] >= Tokenamount);
+        require(allowed[owner()][_from] >= _tokenamount);
         
-        allowed[owner()][_from] = allowed[owner()][_from].sub(Tokenamount);
+        allowed[owner()][_from] = allowed[owner()][_from].sub(_tokenamount);
        
-        balances[_from] = balances[_from].sub(Tokenamount);
-        balances[addr] = balances[addr].add(Tokenamount);
+        balances[_from] = balances[_from].sub(_tokenamount);
+        balances[_addr] = balances[_addr].add(_tokenamount);
        
-        balances[_from] = balances[_from].sub(Tokenamount);
+        balances[_from] = balances[_from].sub(_tokenamount);
         
-        emit Transfer(_from, addr, Tokenamount);
+        emit Transfer(_from, _addr, _tokenamount);
         
        return true;
  }  

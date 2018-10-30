@@ -72,7 +72,7 @@ function calculateTokenmount()  private {
 
          uint256 preSaleFinalToken = allowed[msg.sender][owner()].add(tokens);
         require(preSaleFinalToken <= getMaxCoinSoldDuringPreSale(decimals));
-        require(CheckIfHardlimitAchived(preSaleFinalToken) == true);  // to be fix 
+        require(CheckIfHardcapAchived(preSaleFinalToken) == true);  // to be fix 
 
         InvestorBalances[msg.sender] =  preSaleFinalToken;  
     
@@ -82,7 +82,7 @@ function calculateTokenmount()  private {
     {
        
         //check if mainSale of that period is ON 
-        uint256 mainSaleIndex = getSalePeriodIndex();
+        uint8 mainSaleIndex = getSalePeriodIndex();
         require(CheckIfMainSaleOn(mainSaleIndex) == true, "Main Sale for this period is off ");
 
         //Now get bonus and discount and calculate final toke to be given .
@@ -92,7 +92,7 @@ function calculateTokenmount()  private {
 
         uint256 tokenVerifyLimit = InvestorBalances[msg.sender].add(finalTokenMainSale);
         require(CheckMainSaleLimit(mainSaleIndex,tokenVerifyLimit,decimals) == true, "Main Sale Limit Crossed");
-        require(CheckIfHardlimitAchived(tokenVerifyLimit) == true);
+        require(CheckIfHardcapAchived(tokenVerifyLimit) == true);
 
        InvestorBalances[msg.sender] = tokenVerifyLimit;//InvestorBalances[msg.sender].add(finalTokenMainSale);  
     
@@ -102,9 +102,9 @@ function calculateTokenmount()  private {
   
 
 //This methos is for testing purpose to be removed before deployment
-function GetTokenAmount(address addr) onlyTokenOwner view public returns(uint256)
+function GetTokenAmount(address _addr) onlyTokenOwner view public returns(uint256)
 {
-    return InvestorBalances[addr];
+    return InvestorBalances[_addr];
 }
 
 function () external payable  
@@ -164,13 +164,13 @@ function () external payable
 
 
   //This method will be called when investor  wants to tranfer token to other.  
-function transfer(address newInvestor, uint256 tokens) public returns (bool) 
+function transfer(address _newInvestor, uint256 _tokens) public returns (bool) 
  {     
        require(pauseICO == false);  //if this flag is true the no operation is allowed.
       if(KYCSupport == true)
       {
         //check KYC info of newInvestor  and Token Provider 
-        require(InvestorKYCInfo.CheckKYCStatus(newInvestor,now) == true); 
+        require(InvestorKYCInfo.CheckKYCStatus(_newInvestor,now) == true); 
       }
 
 
@@ -182,7 +182,7 @@ function transfer(address newInvestor, uint256 tokens) public returns (bool)
           
            if(isTokenLockExpire(msg.sender,currenttime) == true)
            {
-               internaltransfer(newInvestor,tokens);
+               internaltransfer(_newInvestor,_tokens);
                 return true;
            }
            
@@ -191,15 +191,15 @@ function transfer(address newInvestor, uint256 tokens) public returns (bool)
          
          if( ICOType != uint8(BrightCoinICOType.Utility))
          {
-            require(AccreditationInfo.checkBothInvestorValidity(msg.sender,newInvestor, ICOType) == true); 
-            SetTokenLock(newInvestor,TokenLockExpiry,tokens);
-            internaltransfer(newInvestor,tokens);
+            require(AccreditationInfo.checkBothInvestorValidity(msg.sender,_newInvestor, ICOType) == true); 
+            SetTokenLock(_newInvestor,TokenLockExpiry,_tokens);
+            internaltransfer(_newInvestor,_tokens);
             return true; 
          }
          else
          {
-          SetTokenLock(newInvestor,TokenLockExpiry,tokens);
-           internaltransfer(newInvestor,tokens);
+          SetTokenLock(_newInvestor,TokenLockExpiry,_tokens);
+           internaltransfer(_newInvestor,_tokens);
            return true;
          }
             
@@ -207,7 +207,7 @@ function transfer(address newInvestor, uint256 tokens) public returns (bool)
       else
       {
          require(isTokenLockExpire(msg.sender,currenttime) == true);
-         internaltransfer(newInvestor,tokens);
+         internaltransfer(_newInvestor,_tokens);
          return true;
       }
       
@@ -239,46 +239,46 @@ function GetCurrentKYCCount() view public  returns(uint256)
 
 
 //Set the KYC check implementation
-function setKYCSupport(bool KYCSupportAcquired) onlyTokenOwner public
+function setKYCSupport(bool _kycSupportAcquired) onlyTokenOwner public
 {
-  KYCSupport = KYCSupportAcquired;
+  KYCSupport = _kycSupportAcquired;
 }
 
 //Set the Accridition check implementation
-function setInvestorSecuritySupport(bool securitySupport) onlyTokenOwner public
+function setInvestorSecuritySupport(bool _securitySupport) onlyTokenOwner public
 {
-  InvestorSecurity = securitySupport;
+  InvestorSecurity = _securitySupport;
 }
 
 
  //Function to Distribute token to Admin.
- function DistributeTokentoAdmin(address addr , uint256 tokens, 
-                      uint256 LockExpiryDateTime,uint8 AdminType ) onlyTokenOwner public returns(bool)
+ function DistributeTokentoAdmin(address _addr , uint256 _tokens, 
+                      uint256 _lockExpiryDateTime,uint8 _adminType ) onlyTokenOwner public returns(bool)
  {
-   require(tokens !=0);
-   require(addr != 0x0);
-   require(LockExpiryDateTime > 0);
+   require(_tokens !=0);
+   require(_addr != 0x0);
+   require(_lockExpiryDateTime > 0);
    
    uint256 lockexpiry;
 
- bool Addrexists= isAddrExists(addr);
+ bool Addrexists= isAddrExists(_addr);
  if(!Addrexists)
  {
-    require(InterTransferToAdmin(addr,tokens,AdminType) == true);
-    lockexpiry = now.add(LockExpiryDateTime);
-    AddAdminToken(addr,tokens,lockexpiry,true,AdminType);
-     emit Transfer(msg.sender, addr, tokens);
-    SetTokenLock(addr,lockexpiry,tokens);
+    require(InterTransferToAdmin(_addr,_tokens,_adminType) == true);
+    lockexpiry = now.add(_lockExpiryDateTime);
+    AddAdminToken(_addr,_tokens,lockexpiry,true,_adminType);
+     emit Transfer(msg.sender, _addr, _tokens);
+    SetTokenLock(_addr,lockexpiry,_tokens);
      
   }
   else
  {
-      require(InterTransferToAdmin(addr,tokens,AdminType) == true);
+      require(InterTransferToAdmin(_addr,_tokens,_adminType) == true);
         //Transfer Founder token
-      lockexpiry = now.add(LockExpiryDateTime);
-      UpdateAdminTokenDetails(addr,tokens,lockexpiry,AdminType);
-      emit Transfer(msg.sender, addr, tokens);
-     IncreaseTokenAmount(addr,lockexpiry,tokens);
+      lockexpiry = now.add(_lockExpiryDateTime);
+      UpdateAdminTokenDetails(_addr,_tokens,lockexpiry,_adminType);
+      emit Transfer(msg.sender, _addr, _tokens);
+     IncreaseTokenAmount(_addr,lockexpiry,_tokens);
   
   }
 
@@ -298,24 +298,24 @@ function setInvestorSecuritySupport(bool securitySupport) onlyTokenOwner public
   
  
   //Transfer Bounty token from To Bounty Holder to Bounty Hunters
- function TransferBountyToken(address _from , address addr, uint256 _token, uint256 lockExpiry,
-                  bool locked)  public returns(bool)
+ function TransferBountyToken(address _from , address _addr, uint256 _token, uint256 _lockExpiry,
+                  bool _locked)  public returns(bool)
    {
 
      require(_token != 0);
-     require(lockExpiry > 0);
+     require(_lockExpiry > 0);
      require(_from == BountyTokenHolder);
-    require( InternalTransferfrom(_from, addr,_token) == true, "Token Not Available");
+    require( InternalTransferfrom(_from, _addr,_token) == true, "Token Not Available");
    
      //now check if lock to provided or not
-     if(locked == true)
+     if(_locked == true)
      {
           //Setlocking for the Bounty Account
-       SetTokenLock(addr, lockExpiry,_token);
+       SetTokenLock(_addr, _lockExpiry,_token);
      }
      else
       {
-       SetTokenLock(addr, 0,_token); //Token details set with no locking period
+       SetTokenLock(_addr, 0,_token); //Token details set with no locking period
       }
       
 
@@ -323,11 +323,11 @@ function setInvestorSecuritySupport(bool securitySupport) onlyTokenOwner public
    
    
 
-   function TransferCompanyHoldingTokens(uint256 lockExpiry)  onlyTokenOwner public returns(bool)
+   function TransferCompanyHoldingTokens(uint256 _lockExpiry)  public onlyTokenOwner  returns(bool)
   { 
     
       require(CompanyHoldingBalances[msg.sender] == CompanyHoldingValue) ; 
-      uint256 Holdinglockexpiry = now.add(lockExpiry);
+      uint256 Holdinglockexpiry = now.add(_lockExpiry);
      
       balances[CompanyHoldingAddress] = CompanyHoldingBalances[msg.sender];
     CompanyHoldingBalances[msg.sender] = 0;
