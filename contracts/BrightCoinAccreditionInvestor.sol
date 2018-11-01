@@ -6,7 +6,8 @@ There is a 1 year lockin period.
 The only exception is that one accredited investor can sell to another accredited investor.
 */
 
-pragma solidity ^0.4.24;
+pragma solidity ^0.4.25;
+
 import "./BrightCoinTokenOwner.sol";
 import "./SafeMath.sol";
 

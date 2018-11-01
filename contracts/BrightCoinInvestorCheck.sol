@@ -37,7 +37,7 @@ How much has this investor invested in the past.
 
 */
 
-pragma solidity ^0.4.24;
+pragma solidity ^0.4.25;
 
 import "./BrightCoinTokenOwner.sol";
 import "./BrightCoinnonAccridetedInvestor.sol";

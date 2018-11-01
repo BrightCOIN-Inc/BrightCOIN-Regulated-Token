@@ -1,4 +1,5 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.4.25;
+
 import "./BrightCoinTokenOwner.sol";
 import "./SafeMath.sol";
 import "./BrightCoinTokenConfig.sol";
@@ -92,7 +93,7 @@ constructor() public
 }
 
 mapping(uint256 => mainSaleTokenDistrubution) mainSaleCountMapping;
-uint256[] internal  mainSaleToken;
+uint256[] internal  mainSaleList;
 
  /**
    * @dev It add mainsale period details 
@@ -119,7 +120,7 @@ function AddMainSalePeriod(uint256 _mainStartDate,uint256 _mainSaleEndDate,uint2
       mainSale.periodActive = _periodActive;
       mainSale.exists = true;
 
-      mainSaleToken.push(_periodIndex);
+      mainSaleList.push(_periodIndex);
       return true;
     }                                                      
                             
@@ -183,7 +184,7 @@ function AddMainSalePeriod(uint256 _mainStartDate,uint256 _mainSaleEndDate,uint2
    */
   function MainSaleCount() view public returns(uint256)
   {
-     return mainSaleToken.length;
+     return mainSaleList.length;
   }
 
   /**
@@ -225,11 +226,11 @@ function AddMainSalePeriod(uint256 _mainStartDate,uint256 _mainSaleEndDate,uint2
   function checkMainSalePeriod( uint256 _currenttime) view internal returns(uint256)
   {
 
-  if(mainSaleToken.length  == 0)
+  if(mainSaleList.length  == 0)
     return 0;
   //get first MainSale period Index
   uint8 periodindex;
-  for(periodindex = 0; periodindex <=mainSaleToken.length; periodindex++)
+  for(periodindex = 0; periodindex <=mainSaleList.length; periodindex++)
   {
   mainSaleTokenDistrubution storage mainSaleTokenSale = mainSaleCountMapping[periodindex];
   if( (mainSaleTokenSale.mainStartDate <= _currenttime) && 

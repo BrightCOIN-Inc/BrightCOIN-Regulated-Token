@@ -4,8 +4,9 @@ Reg S -
  This can have a 6 Month or a 1 year lockin. 
  (KYC/AML has to be done). The other rule is that these tokens cannot be sold to a USA person for a 1 year period. 
  */
+ 
+pragma solidity ^0.4.25;
 
-pragma solidity ^0.4.24;
 import "./BrightCoinTokenOwner.sol";
 import "./SafeMath.sol";
 
