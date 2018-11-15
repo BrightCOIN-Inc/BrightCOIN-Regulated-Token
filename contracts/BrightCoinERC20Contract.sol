@@ -184,38 +184,25 @@ function totalSupply() public constant returns (uint256) {
       return totalSupply;
   }
 
- 
-  function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-      
-        return true;
-    }
-    
-
-    function approve(address _spender, uint256 _value) public returns (bool success) {
-     
- 
-        return true;
-    }
-    
-    function allowance(address _owner, address _spender) public view returns (uint256) {
-        return 1;
-      }
+function allowance(address _owner, address _spender) public view returns (uint256) {
+        return allowed[_owner][_spender];
+}
     
    
     /// @notice Will Transfer tokens from current address to receipient address.
     /// @param _to  addresses to send token.
     /// @param _tokens amount of token to be transferred.
-    function internaltransfer(address _to, uint256 _tokens) internal returns (bool) {
+    function internaltransfer(address _from, address _to, uint256 _tokens) internal returns (bool) {
   
      // Prevent transfer to 0x0 address. 
     require(_to != 0x0);
     require (_tokens > 0);
-   require (msg.sender != _to);
-   require(balances[msg.sender] >= _tokens);
+   require (_from != _to);
+   require(balances[_from] >= _tokens);
    require(balances[_to] + _tokens > balances[_to]);
-    balances[msg.sender] = balances[msg.sender].sub(_tokens);
+    balances[_from] = balances[_from].sub(_tokens);
     balances[_to] = balances[_to].add(_tokens);
-    emit Transfer(msg.sender, _to, _tokens);
+    emit Transfer(_from, _to, _tokens);
     
     return true;
    }
@@ -315,16 +302,9 @@ function totalSupply() public constant returns (uint256) {
  {
      
         require(allowed[owner()][_from] >= _tokenamount);
-        
+        require(internaltransfer(_from, _addr, _tokenamount) == true);
         allowed[owner()][_from] = allowed[owner()][_from].sub(_tokenamount);
        
-        balances[_from] = balances[_from].sub(_tokenamount);
-        balances[_addr] = balances[_addr].add(_tokenamount);
-       
-        balances[_from] = balances[_from].sub(_tokenamount);
-        
-        emit Transfer(_from, _addr, _tokenamount);
-        
        return true;
  }  
  

@@ -137,7 +137,7 @@ function () external payable
 
         uint256 tokens = InvestorBalances[AddrOfInvestor];
       
-       internaltransfer(AddrOfInvestor,tokens);
+       internaltransfer(msg.sender,AddrOfInvestor,tokens);
        SetTokenLock(AddrOfInvestor,tokenTimeLock,tokens);
         InvestorBalances[AddrOfInvestor] = 0; //To avoid re-entrancy  
             
@@ -155,7 +155,7 @@ function () external payable
               }
 
                 uint256 MainSaletokens = InvestorBalances[AddrOfInvestor];
-                internaltransfer(AddrOfInvestor,MainSaletokens);
+                internaltransfer(msg.sender,AddrOfInvestor,MainSaletokens);
                 SetTokenLock(AddrOfInvestor,tokenTimeLock,MainSaletokens);
                 InvestorBalances[AddrOfInvestor] = 0; //To avoid re-entrancy
              }              
@@ -163,44 +163,49 @@ function () external payable
 
   }
 
-
-  //This method will be called when investor  wants to tranfer token to other.  
-function transfer(address _newInvestor, uint256 _tokens) public returns (bool) 
- {     
-       require(pauseICO == false);  //if this flag is true the no operation is allowed.
-      if(KYCSupport == true)
+  function checkCompliance(address _investor) view private  returns(bool)
+{
+     if(KYCSupport == true)
       {
         //check KYC info of newInvestor  and Token Provider 
-        require(InvestorKYCInfo.CheckKYCStatus(_newInvestor,now) == true); 
+        require(InvestorKYCInfo.CheckKYCStatus(_investor,now) == true); 
+      }
+    if(InvestorSecurity == true)
+      {
+         require(AccreditationInfo.checkInvestorValidity(_investor,ICOType) == true);
       }
 
+      return true;
+}
 
-      //check if locking period is expired or not 
+function regulatedtransfer( address _from , address _to, uint256 _tokens) private returns(bool) 
+{
+    //check if locking period is expired or not 
       uint256 currenttime = now;
       
       if (InvestorSecurity == true)
       {
           
-           if(isTokenLockExpire(msg.sender,currenttime) == true)
+           if(isTokenLockExpire(_from,currenttime) == true)
            {
-               internaltransfer(_newInvestor,_tokens);
+               internaltransfer(_from,_to,_tokens);
                 return true;
            }
            
-           uint256 TokenLockExpiry = getTokenLockExpiry(msg.sender); 
+           uint256 TokenLockExpiry = getTokenLockExpiry(_from); 
            require(TokenLockExpiry !=0);
          
          if( ICOType != uint8(BrightCoinICOType.Utility))
          {
-            require(AccreditationInfo.checkBothInvestorValidity(msg.sender,_newInvestor, ICOType) == true); 
-            SetTokenLock(_newInvestor,TokenLockExpiry,_tokens);
-            internaltransfer(_newInvestor,_tokens);
+            require(AccreditationInfo.checkBothInvestorValidity(_from,_to, ICOType) == true); 
+            SetTokenLock(_to,TokenLockExpiry,_tokens);
+            internaltransfer(_from,_to,_tokens);
             return true; 
          }
          else
          {
-          SetTokenLock(_newInvestor,TokenLockExpiry,_tokens);
-           internaltransfer(_newInvestor,_tokens);
+          SetTokenLock(_to,TokenLockExpiry,_tokens);
+           internaltransfer(_from,_to,_tokens);
            return true;
          }
             
@@ -208,10 +213,47 @@ function transfer(address _newInvestor, uint256 _tokens) public returns (bool)
       else
       {
          require(isTokenLockExpire(msg.sender,currenttime) == true);
-         internaltransfer(_newInvestor,_tokens);
+         internaltransfer(_from,_to,_tokens);
          return true;
       }
       
+}
+
+function transferFrom(address _from, address _to, uint256 _tokens) public returns (bool success) 
+{
+      
+       require(pauseICO == false);  //if this flag is true the no operation is allowed.
+      require(_tokens > 0);
+      require(allowed[_from][msg.sender] >= _tokens);
+      require(checkCompliance(_to) == true);
+      require(regulatedtransfer(_from ,_to,_tokens) == true);
+      //If regulated transfer is true then only reduce allowed map
+      allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_tokens);
+      return true;
+}
+    
+
+function approve(address _spender, uint256 _value) public returns (bool success)
+ {
+     require(_spender != address(0));
+      require(checkCompliance(_spender) == true);
+      allowed[msg.sender][_spender] = _value;
+      emit Approval(msg.sender, _spender, _value);
+      
+      return true;
+ }
+  //This method will be called when investor  wants to tranfer token to other.  
+function transfer(address _to, uint256 _tokens) public returns (bool) 
+ {     
+      require(pauseICO == false);  //if this flag is true the no operation is allowed.
+      require(_to != address(0));
+      if(KYCSupport == true)
+      {
+        //check KYC info of newInvestor  and Token Provider 
+        require(InvestorKYCInfo.CheckKYCStatus(_to,now) == true); 
+      }
+
+      require(regulatedtransfer(msg.sender, _to, _tokens) == true);  
       
 }
       
