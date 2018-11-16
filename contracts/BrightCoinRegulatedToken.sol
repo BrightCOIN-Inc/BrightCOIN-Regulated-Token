@@ -117,47 +117,47 @@ function () external payable
 }
 
 
-  function DistributeToken(address AddrOfInvestor, uint256 currenttime,
-                    uint256 tokenlockPeriod, uint8 MainSalePeriodIndex) public onlyTokenOwner 
+  function DistributeToken(address _addrOfInvestor, uint256 _currenttime,
+                    uint256 _tokenlockPeriod, uint8 _mainSalePeriodIndex) public onlyTokenOwner 
   {
 
-      require(AddrOfInvestor != 0x0);
-      require(currenttime >0);
-      require(tokenlockPeriod > 0);
+      require(_addrOfInvestor != 0x0);
+      require(_currenttime >0);
+      require(_tokenlockPeriod > 0);
 
-     uint256 tokenTimeLock = now.add(tokenlockPeriod);
+     uint256 tokenTimeLock = now.add(_tokenlockPeriod);
        
-        if((MainSalePeriodIndex == 0) && (PreSaleOn == true))  //PreSale
+        if((_mainSalePeriodIndex == 0) && (PreSaleOn == true))  //PreSale
         {
         
         if(InvestorSecurity == true)
         {
-         require(AccreditationInfo.checkInvestorValidity(AddrOfInvestor,ICOType) == true);
+         require(AccreditationInfo.checkInvestorValidity(_addrOfInvestor,ICOType) == true);
         }
 
-        uint256 tokens = InvestorBalances[AddrOfInvestor];
+        uint256 tokens = InvestorBalances[_addrOfInvestor];
       
-       internaltransfer(msg.sender,AddrOfInvestor,tokens);
-       SetTokenLock(AddrOfInvestor,tokenTimeLock,tokens);
-        InvestorBalances[AddrOfInvestor] = 0; //To avoid re-entrancy  
+       internaltransfer(msg.sender,_addrOfInvestor,tokens);
+       SetTokenLock(_addrOfInvestor,tokenTimeLock,tokens);
+        InvestorBalances[_addrOfInvestor] = 0; //To avoid re-entrancy  
             
         }
         else
         {
             //Calculate token amount
-            if(CheckIfMainSaleOn(MainSalePeriodIndex) == true)
+            if(CheckIfMainSaleOn(_mainSalePeriodIndex) == true)
             {
 
-              require(CheckTokenPeriodSale(currenttime,MainSalePeriodIndex) == true);
+              require(CheckTokenPeriodSale(_currenttime,_mainSalePeriodIndex) == true);
               if(InvestorSecurity == true)
               {
-                require(AccreditationInfo.checkInvestorValidity(AddrOfInvestor,ICOType) == true);    
+                require(AccreditationInfo.checkInvestorValidity(_addrOfInvestor,ICOType) == true);    
               }
 
-                uint256 MainSaletokens = InvestorBalances[AddrOfInvestor];
-                internaltransfer(msg.sender,AddrOfInvestor,MainSaletokens);
-                SetTokenLock(AddrOfInvestor,tokenTimeLock,MainSaletokens);
-                InvestorBalances[AddrOfInvestor] = 0; //To avoid re-entrancy
+                uint256 MainSaletokens = InvestorBalances[_addrOfInvestor];
+                internaltransfer(msg.sender,_addrOfInvestor,MainSaletokens);
+                SetTokenLock(_addrOfInvestor,tokenTimeLock,MainSaletokens);
+                InvestorBalances[_addrOfInvestor] = 0; //To avoid re-entrancy
              }              
         }
 
@@ -265,15 +265,15 @@ function transfer(address _to, uint256 _tokens) public returns (bool)
       
 
 function setKYCAndAccridetionAddres(address _kyc, 
-                      address _InvestorAcrridetion ) public onlyTokenOwner  
+                      address _investorAcrridetion ) public onlyTokenOwner  
 {
 
 	
 	BrightCoinInvestorKYCAddress = _kyc;
-	BrightCoinInvestorAccreditationAddress = _InvestorAcrridetion;
+	BrightCoinInvestorAccreditationAddress = _investorAcrridetion;
 
     InvestorKYCInfo = BrightCoinInvestorKYC(_kyc);
-    AccreditationInfo = BrightCoinInvestorCheck(_InvestorAcrridetion);
+    AccreditationInfo = BrightCoinInvestorCheck(_investorAcrridetion);
     
 }
 
