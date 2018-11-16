@@ -103,7 +103,7 @@ function calculateTokenmount()  private {
   
 
 //This methos is for testing purpose to be removed before deployment
-function GetTokenAmount(address _addr) onlyTokenOwner view public returns(uint256)
+function GetTokenAmount(address _addr)view public  onlyTokenOwner  returns(uint256)
 {
     return InvestorBalances[_addr];
 }
@@ -118,7 +118,7 @@ function () external payable
 
 
   function DistributeToken(address AddrOfInvestor, uint256 currenttime,
-                    uint256 tokenlockPeriod, uint8 MainSalePeriodIndex) onlyTokenOwner public
+                    uint256 tokenlockPeriod, uint8 MainSalePeriodIndex) public onlyTokenOwner 
   {
 
       require(AddrOfInvestor != 0x0);
@@ -225,7 +225,12 @@ function transferFrom(address _from, address _to, uint256 _tokens) public return
        require(pauseICO == false);  //if this flag is true the no operation is allowed.
       require(_tokens > 0);
       require(allowed[_from][msg.sender] >= _tokens);
-      require(checkCompliance(_to) == true);
+     // require(checkCompliance(_to) == true);
+     if(KYCSupport == true)
+      {
+        //check KYC info of newInvestor  and Token Provider 
+        require(InvestorKYCInfo.CheckKYCStatus(_to,now) == true); 
+      }
       require(regulatedtransfer(_from ,_to,_tokens) == true);
       //If regulated transfer is true then only reduce allowed map
       allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_tokens);
@@ -253,13 +258,14 @@ function transfer(address _to, uint256 _tokens) public returns (bool)
         require(InvestorKYCInfo.CheckKYCStatus(_to,now) == true); 
       }
 
-      require(regulatedtransfer(msg.sender, _to, _tokens) == true);  
+      require(regulatedtransfer(msg.sender, _to, _tokens) == true); 
+       
       
 }
       
 
 function setKYCAndAccridetionAddres(address _kyc, 
-                      address _InvestorAcrridetion ) onlyTokenOwner public 
+                      address _InvestorAcrridetion ) public onlyTokenOwner  
 {
 
 	
@@ -282,13 +288,13 @@ function GetCurrentKYCCount() view public  returns(uint256)
 
 
 //Set the KYC check implementation
-function setKYCSupport(bool _kycSupportAcquired) onlyTokenOwner public
+function setKYCSupport(bool _kycSupportAcquired) public onlyTokenOwner 
 {
   KYCSupport = _kycSupportAcquired;
 }
 
 //Set the Accridition check implementation
-function setInvestorSecuritySupport(bool _securitySupport) onlyTokenOwner public
+function setInvestorSecuritySupport(bool _securitySupport) public onlyTokenOwner 
 {
   InvestorSecurity = _securitySupport;
 }
@@ -296,7 +302,7 @@ function setInvestorSecuritySupport(bool _securitySupport) onlyTokenOwner public
 
  //Function to Distribute token to Admin.
  function DistributeTokentoAdmin(address _addr , uint256 _tokens, 
-                      uint256 _lockExpiryDateTime,uint8 _adminType ) onlyTokenOwner public returns(bool)
+                      uint256 _lockExpiryDateTime,uint8 _adminType ) public onlyTokenOwner  returns(bool)
  {
    require(_tokens !=0);
    require(_addr != 0x0);
@@ -331,7 +337,7 @@ function setInvestorSecuritySupport(bool _securitySupport) onlyTokenOwner public
 
  
   
-  function TransferTokenBountyOwner() onlyTokenOwner public
+  function TransferTokenBountyOwner() public onlyTokenOwner 
   {
   
       allowed[msg.sender][BountyTokenHolder]  = balances[BountyTokenHolder];
@@ -366,7 +372,7 @@ function setInvestorSecuritySupport(bool _securitySupport) onlyTokenOwner public
    
    
 
-   function TransferCompanyHoldingTokens(uint256 _lockExpiry)  public onlyTokenOwner  returns(bool)
+   function TransferCompanyHoldingTokens(uint256 _lockExpiry) public onlyTokenOwner     returns(bool)
   { 
     
       require(CompanyHoldingBalances[msg.sender] == CompanyHoldingValue) ; 
